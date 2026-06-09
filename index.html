@@ -326,7 +326,8 @@ const TREE = {
                    {spouse:{name:'Doreen'},children:[
                      {blood:true,deceased:true,name:'Warren'},
                      {blood:true,nickname:'Little Norman',name:'Norman Collins III'}
-                   ]}
+                   ]},
+                   {spouse:{name:'Leona Collins'},children:[]}
                  ]},
                  {blood:true,name:'Denise Collins',meals:['?','?','?'],marriages:[]}
                ]},
@@ -384,7 +385,7 @@ const TREE = {
                      ]},
                      {blood:true,name:'Sherell Duncan',marriages:[
                        {spouse:{name:'Marcy Baretto'},children:[{blood:true,name:'Amayah Baretto'}]},
-                       {spouse:{name:'??',unknown:true},children:[{blood:true,name:'Zacari'}]}
+                       {spouse:{name:'Robert Cardoza Jr.'},children:[{blood:true,name:'Zacari Cardoza'}]}
                      ]}
                    ]}
                  ]}
@@ -451,8 +452,7 @@ const TREE = {
                   ]
                 }
               ]
-            },
-            {blood:true,name:'Peewee'}
+            }
           ]
         },
         {
@@ -465,7 +465,9 @@ const TREE = {
           ]
         }
         ]
-      }
+      },
+      // Peewee
+      {blood:true,name:'Peewee',marriages:[]}
     ]
   }]
 };
@@ -497,13 +499,13 @@ function makeCard(person,isSpouse){
   h+=`<span class="fullname">${n}</span>`;
   if(person.adopted&&person.adoptedBy)h+=`<span class="adopted-note">by ${person.adoptedBy}</span>`;
   if(person.deceased)h+=doveMark();
+  /* MEALS HIDDEN — uncomment to re-enable when ready
   if(!isSpouse&&person.meals){
     const safeJson=JSON.stringify(person.meals);
     const safeName=person.name||'';
-    /* MEALS HIDDEN — uncomment to re-enable
     h+=`<button class="meal-btn" data-name="${safeName.replace(/"/g,'&quot;')}" data-meals='${safeJson.replace(/'/g,'&#39;')}' title="Favorite meals">${forkSVG()}</button>`;
-    */
   }
+  */
   // Touch toggle for tooltip on mobile
   const touchAttr=`ontouchstart="this.classList.toggle('tip-open');event.stopPropagation()"`;
   return `<div class="${cls.join(' ')}" ${touchAttr}>${h}</div>`;
