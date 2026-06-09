@@ -24,59 +24,104 @@
   .legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px;}
   .legend-item{background:rgba(255,255,255,.16);border-radius:20px;padding:4px 10px;color:#fff;font-size:.75rem;display:flex;align-items:center;gap:6px;}
 
-  /* TREE */
-  .tree-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:30px 20px 60px;}
-  .scroll-hint{text-align:center;font-size:.75rem;color:var(--muted);padding:8px 0 0;font-style:italic;}
+  /* TREE WRAP */
+  .tree-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:30px 16px 60px;}
+  .scroll-hint{text-align:center;font-size:.75rem;color:var(--muted);padding:6px 0 2px;font-style:italic;}
   @media(min-width:700px){.scroll-hint{display:none;}}
 
-  /* TOP-DOWN CONNECTED TREE */
-  .tree-root{display:flex;justify-content:center;}
-  .person-node{display:flex;flex-direction:column;align-items:center;position:relative;padding:0 6px;}
-  .couple-row{display:flex;align-items:center;justify-content:center;gap:0;}
-  .plus{font-size:1rem;color:var(--bark-light);font-weight:700;padding:0 3px;align-self:center;flex-shrink:0;}
-  .v-stem{width:2px;background:var(--connector);margin:0 auto;}
-  .expand-dot{width:20px;height:20px;border-radius:50%;background:var(--leaf);color:#fff;font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto;cursor:pointer;transition:background .2s,transform .2s;flex-shrink:0;position:relative;z-index:2;}
+  /* ── SHARED ELEMENTS (both layouts) ── */
+  .expand-dot{width:20px;height:20px;border-radius:50%;background:var(--leaf);color:#fff;font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s,transform .2s;flex-shrink:0;position:relative;z-index:2;}
   .expand-dot:hover{background:var(--bark);transform:scale(1.15);}
   .expand-dot.open{background:var(--rose);}
-  .children-section{display:flex;flex-direction:column;align-items:center;}
-  .children-section.hidden{display:none;}
-  .h-bar-wrap{position:relative;width:100%;}
-  .h-bar{height:2px;background:var(--connector);position:absolute;top:0;left:0;right:0;}
-  .children-row{display:flex;justify-content:center;align-items:flex-start;gap:0;position:relative;padding-top:2px;}
-  .child-slot{display:flex;flex-direction:column;align-items:center;padding:0 6px;}
-  .child-drop{width:2px;background:var(--connector);}
-  .marriages-stack{display:flex;flex-direction:column;align-items:center;gap:0;width:100%;}
-  .marriage-block{display:flex;flex-direction:column;align-items:center;width:100%;}
-  .marriage-divider{width:60%;height:1px;border-top:1px dashed var(--connector);margin:4px auto;}
-  .marriage-label{font-size:.58rem;color:var(--muted);font-style:italic;margin:2px 0;text-align:center;white-space:nowrap;}
-  .bio-row{display:flex;align-items:center;gap:6px;margin:6px auto;}
-  .bio-connector{height:2px;border-top:2px dashed var(--rose);width:20px;flex-shrink:0;}
+  .plus{font-size:.95rem;color:var(--bark-light);font-weight:700;padding:0 3px;align-self:center;flex-shrink:0;}
+  .marriage-label{font-size:.6rem;color:var(--muted);font-style:italic;text-align:center;white-space:nowrap;}
+  .marriage-divider{border-top:1px dashed var(--connector);margin:4px auto;width:60%;}
+  .bio-tag{font-size:.6rem;font-style:italic;color:var(--rose);font-weight:700;background:rgba(192,97,107,.1);border:1px dashed var(--rose);border-radius:6px;padding:2px 5px;margin-top:3px;text-align:center;}
 
-  /* CARDS */
-  .card{display:inline-flex;flex-direction:column;align-items:center;background:var(--card-bg);border:2px solid var(--bark-light);border-radius:14px;padding:7px 9px;cursor:pointer;box-shadow:0 2px 8px var(--shadow);transition:transform .18s,box-shadow .18s,border-color .18s;width:108px;min-width:76px;max-width:118px;text-align:center;user-select:none;word-break:break-word;overflow-wrap:break-word;white-space:normal;}
-  @media(max-width:480px){.card{width:88px;min-width:70px;max-width:96px;padding:5px 6px;border-radius:11px;}}
-  .card:hover{transform:translateY(-2px);box-shadow:0 6px 18px var(--shadow);border-color:var(--leaf);}
-  .card.blood{border-color:var(--bark);background:linear-gradient(135deg,#fffdf8,#f6efe2);}
-  .card.spouse{border-color:var(--leaf-light);background:linear-gradient(135deg,#f5fbf5,#e8f5e9);}
-  .card.root{border-color:var(--gold);background:linear-gradient(135deg,#fffde7,#fff3cd);box-shadow:0 4px 16px rgba(212,160,23,.25);}
-  .card.unknown{border-style:dotted;opacity:.8;}
-  .card.deceased{background:var(--deceased-bg) !important;border-color:var(--deceased-border) !important;}
-  .card.no-children{cursor:default;}
-  .card.no-children:hover{transform:none;box-shadow:0 2px 8px var(--shadow);}
-  .nickname{font-size:.67rem;font-style:italic;color:var(--rose);font-weight:700;line-height:1;margin-bottom:2px;}
-  .fullname{font-size:.77rem;font-weight:700;color:var(--text);line-height:1.3;word-break:break-word;}
+  /* ══ MOBILE LAYOUT (< 700px) — vertical stacked list ══ */
+  @media(max-width:699px){
+    .tree-root{display:block;}
+    .person-node{display:block;margin:0 0 0 20px;position:relative;}
+    /* indent line down the left */
+    .person-node::before{content:'';position:absolute;left:-12px;top:0;bottom:0;width:2px;background:var(--connector);opacity:.4;}
+    .person-node:last-child::before{bottom:50%;}
+    .couple-row{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:6px 0;}
+    .v-stem{display:none;}
+    .expand-dot{display:inline-flex;margin:0 0 0 6px;vertical-align:middle;}
+    .children-section{display:block;margin-left:12px;border-left:2px solid var(--connector);padding-left:10px;}
+    .children-section.hidden{display:none;}
+    .h-bar-wrap{display:none;}
+    .children-row{display:block;}
+    .child-slot{display:block;}
+    .child-drop{display:none;}
+    .marriages-stack{display:block;}
+    .marriage-block{display:block;padding:4px 0;}
+    .bio-row{display:flex;align-items:flex-start;gap:8px;padding:4px 0;}
+    .bio-connector{border-top:2px dashed var(--rose);width:16px;flex-shrink:0;margin-top:14px;}
+    /* Mobile cards: full readable text, wrapping allowed */
+    .card{display:inline-flex;flex-direction:column;align-items:flex-start;background:var(--card-bg);border:2px solid var(--bark-light);border-radius:10px;padding:6px 9px;box-shadow:0 2px 6px var(--shadow);text-align:left;user-select:none;position:relative;max-width:200px;min-width:100px;}
+    .card.blood{border-color:var(--gold);background:linear-gradient(135deg,#fffde7,#fff3cd);}
+    .card.spouse{border-color:var(--leaf-light);background:linear-gradient(135deg,#f5fbf5,#e8f5e9);}
+    .card.root{border-color:var(--gold);background:linear-gradient(135deg,#fffde7,#fff3cd);}
+    .card.deceased{background:#e8e4d9!important;border-color:#b8a878!important;}
+    .card.unknown{border-style:dotted;opacity:.8;}
+    .nickname{font-size:.65rem;font-style:italic;color:var(--rose);font-weight:700;line-height:1;margin-bottom:1px;white-space:normal;overflow:visible;}
+    .fullname{font-size:.8rem;font-weight:700;color:var(--text);line-height:1.3;white-space:normal;overflow:visible;text-overflow:clip;}
+    .card.deceased .fullname{color:var(--deceased-text);}
+    .adopted-note{font-size:.62rem;color:var(--rose);font-style:italic;margin-top:2px;white-space:normal;overflow:visible;}
+    .name-tip{display:none!important;}
+    .dove{margin-top:3px;font-size:.8rem;}
+    .meal-btn{margin-top:3px;}
+  }
+
+  /* ══ DESKTOP LAYOUT (≥ 700px) — horizontal top-down tree ══ */
+  @media(min-width:700px){
+    .tree-root{display:inline-flex;justify-content:center;min-width:100%;}
+    .person-node{display:flex;flex-direction:column;align-items:center;position:relative;padding:0 4px;}
+    .couple-row{display:flex;align-items:center;justify-content:center;}
+    .v-stem{width:2px;background:var(--connector);margin:0 auto;}
+    .children-section{display:flex;flex-direction:column;align-items:center;}
+    .children-section.hidden{display:none;}
+    .h-bar-wrap{position:relative;width:100%;height:2px;}
+    .h-bar{height:2px;background:var(--connector);position:absolute;top:0;left:0;right:0;}
+    .children-row{display:flex;justify-content:center;align-items:flex-start;gap:0;padding-top:2px;}
+    .child-slot{display:flex;flex-direction:column;align-items:center;padding:0 4px;}
+    .child-drop{width:2px;background:var(--connector);}
+    .marriages-stack{display:flex;flex-direction:column;align-items:center;width:100%;}
+    .marriage-block{display:flex;flex-direction:column;align-items:center;width:100%;}
+    .bio-row{display:flex;align-items:center;gap:6px;margin:6px auto;}
+    .bio-connector{height:2px;border-top:2px dashed var(--rose);width:20px;flex-shrink:0;}
+    /* Desktop cards: compact single-line with tooltip for long names */
+    .card{display:inline-flex;flex-direction:column;align-items:center;background:var(--card-bg);border:2px solid var(--bark-light);border-radius:10px;padding:5px 6px;cursor:pointer;box-shadow:0 2px 6px var(--shadow);transition:transform .18s,box-shadow .18s,border-color .18s;width:92px;text-align:center;user-select:none;flex-shrink:0;position:relative;}
+    .card:hover{transform:translateY(-2px);box-shadow:0 5px 14px var(--shadow);border-color:var(--leaf);}
+    .card.blood{border-color:var(--gold);background:linear-gradient(135deg,#fffde7,#fff3cd);}
+    .card.spouse{border-color:var(--leaf-light);background:linear-gradient(135deg,#f5fbf5,#e8f5e9);}
+    .card.root{border-color:var(--gold);background:linear-gradient(135deg,#fffde7,#fff3cd);box-shadow:0 4px 14px rgba(212,160,23,.25);width:104px;}
+    .card.deceased{background:#e8e4d9!important;border-color:#b8a878!important;}
+    .card.unknown{border-style:dotted;opacity:.8;}
+    .card.no-children{cursor:default;}
+    .card.no-children:hover{transform:none;box-shadow:0 2px 6px var(--shadow);}
+    .nickname{font-size:.6rem;font-style:italic;color:var(--rose);font-weight:700;line-height:1;margin-bottom:1px;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .fullname{font-size:.7rem;font-weight:700;color:var(--text);line-height:1.2;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .card.deceased .fullname{color:var(--deceased-text);}
+    .adopted-note{font-size:.55rem;color:var(--rose);font-style:italic;margin-top:1px;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .dove{margin-top:3px;font-size:.75rem;line-height:1;}
+    .meal-btn{padding:1px;margin-top:2px;}
+    /* Tooltip */
+    .name-tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--bark);color:#fff;font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:8px;white-space:nowrap;pointer-events:none;z-index:50;box-shadow:0 3px 10px rgba(0,0,0,.25);}
+    .name-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--bark);}
+    .card:hover .name-tip{display:block;}
+  }
+
+
+  /* SHARED — both layouts */
   .card.deceased .fullname{color:var(--deceased-text);}
   .card.deceased .nickname{color:#7a8fa6;}
-  .dove{margin-top:4px;font-size:.85rem;line-height:1;}
-  .adopted-heart{display:inline-block;cursor:default;position:relative;margin-left:2px;}
-  .adopted-heart .tip{display:none;position:absolute;bottom:130%;left:50%;transform:translateX(-50%);background:var(--rose);color:#fff;font-size:.68rem;padding:3px 8px;border-radius:8px;white-space:nowrap;pointer-events:none;z-index:20;}
-  .adopted-heart:hover .tip{display:block;}
-  .adopted-note{font-size:.6rem;color:var(--rose);font-style:italic;margin-top:2px;line-height:1.3;word-break:break-word;}
-  .meal-btn{background:none;border:none;cursor:pointer;padding:2px;margin-top:3px;transition:transform .15s;display:flex;align-items:center;justify-content:center;}
+  .meal-btn{background:none;border:none;cursor:pointer;transition:transform .15s;display:flex;align-items:center;justify-content:center;}
   .meal-btn:hover{transform:scale(1.25);}
-  .bio-tag{font-size:.6rem;font-style:italic;color:var(--rose);font-weight:700;background:rgba(192,97,107,.1);border:1px dashed var(--rose);border-radius:8px;padding:2px 5px;margin-top:3px;word-break:break-word;line-height:1.3;}
+  .adopted-heart{display:inline-block;cursor:default;position:relative;margin-left:2px;vertical-align:middle;}
 
-  /* MODAL */
+
   .modal-overlay{display:none;position:fixed;inset:0;background:rgba(46,31,15,.5);z-index:100;align-items:center;justify-content:center;padding:16px;}
   .modal-overlay.open{display:flex;}
   .modal{background:var(--card-bg);border-radius:20px;padding:24px 20px;max-width:360px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.3);position:relative;border:3px solid var(--gold);}
@@ -142,7 +187,7 @@
   <h1>The Martins Family Tree</h1>
   <p class="hero-sub">Rooted in love · Honoring every branch · Growing through generations</p>
   <div class="legend">
-    <div class="legend-item"><svg width="13" height="13" viewBox="0 0 13 13"><rect x="1" y="1" width="11" height="11" rx="3" fill="#D4A017"/></svg>Blood — Martin line</div>
+    <div class="legend-item"><svg width="13" height="13" viewBox="0 0 13 13"><rect x="1" y="1" width="11" height="11" rx="3" fill="#D4A017"/></svg>Martin blood line</div>
     <div class="legend-item"><svg width="13" height="13" viewBox="0 0 13 13"><rect x="1" y="1" width="11" height="11" rx="3" fill="#5AA85F"/></svg>Married in</div>
     <div class="legend-item">🕊️ At rest</div>
     <div class="legend-item"><svg width="14" height="18" viewBox="0 0 22 28"><use href="#fork-knife"/></svg>Favorite meals</div>
@@ -215,7 +260,7 @@ const TREE = {
       {blood:true,deceased:true,name:'Dennis Martin',
        marriages:[{spouse:{name:'Ethel',deceased:true},children:[]}]},
       // Mae-Mae
-      {blood:true,deceased:true,nickname:'Mae-Mae',name:'Mable Martin',
+      {blood:true,deceased:true,nickname:'Mae-Mae',name:'Martin',
        marriages:[{
          spouse:{name:'John Moseby',deceased:true},
          children:[
@@ -375,31 +420,40 @@ function makeCard(person,isSpouse){
   if(person.unknown)cls.push('unknown');
   const hasKids=!isSpouse&&((person.marriages&&person.marriages.some(m=>m.children&&m.children.length))||person.bioChild);
   if(!hasKids&&!(person.meals&&!isSpouse))cls.push('no-children');
-  let h='';
+
+  // Full name for tooltip (nickname + name)
+  const fullLabel=[person.nickname,person.name].filter(Boolean).join(' · ');
+  const adoptedLabel=person.adopted&&person.adoptedBy?` · Adopted by ${person.adoptedBy}`:'';
+  const tipText=fullLabel+adoptedLabel;
+
+  let h=`<div class="name-tip">${tipText}</div>`;
   if(person.nickname)h+=`<span class="nickname">${person.nickname}</span>`;
   let n=person.name;
-  if(person.adopted)n+=` <span class="adopted-heart">${heartSVG()}<span class="tip">Adopted with love</span></span>`;
+  if(person.adopted)n+=` ${heartSVG()}`;
   h+=`<span class="fullname">${n}</span>`;
-  if(person.adopted&&person.adoptedBy)h+=`<span class="adopted-note">Adopted by ${person.adoptedBy}</span>`;
+  if(person.adopted&&person.adoptedBy)h+=`<span class="adopted-note">by ${person.adoptedBy}</span>`;
   if(person.deceased)h+=doveMark();
   if(!isSpouse&&person.meals){
-    const mj=JSON.stringify(person.meals).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    h+=`<button class="meal-btn" onclick="openMeals(event,'${(person.name||'').replace(/'/g,"\\'")}',${mj})" title="Favorite meals">${forkSVG()}</button>`;
+    const safeJson=JSON.stringify(person.meals);
+    const safeName=person.name||'';
+    h+=`<button class="meal-btn" data-name="${safeName.replace(/"/g,'&quot;')}" data-meals='${safeJson.replace(/'/g,'&#39;')}' title="Favorite meals">${forkSVG()}</button>`;
   }
-  return `<div class="${cls.join(' ')}">${h}</div>`;
+  // Touch toggle for tooltip on mobile
+  const touchAttr=`ontouchstart="this.classList.toggle('tip-open');event.stopPropagation()"`;
+  return `<div class="${cls.join(' ')}" ${touchAttr}>${h}</div>`;
 }
 
-/* Render a row of children with a shared horizontal bar above them */
+/* Render children with horizontal bar (desktop) or plain list (mobile — CSS handles display) */
 function renderChildrenSection(children, uid) {
   if(!children||!children.length) return '';
   const slots = children.map(c=>`
     <div class="child-slot">
-      <div class="child-drop" style="height:18px"></div>
+      <div class="child-drop" style="height:16px"></div>
       ${renderPerson(c)}
     </div>`).join('');
   return `
     <div class="children-section hidden" id="${uid}">
-      <div class="h-bar-wrap" style="height:2px"><div class="h-bar"></div></div>
+      <div class="h-bar-wrap"><div class="h-bar"></div></div>
       <div class="children-row">${slots}</div>
     </div>`;
 }
@@ -409,34 +463,32 @@ function renderPerson(person){
   const hasBio = !!person.bioChild;
   const selfCard = makeCard(person, false);
 
-  // Single marriage (or none): simple top-down layout
+  // Single marriage (or none)
   if(!hasBio && marriages.length<=1){
     const marriage = marriages[0];
     const hasKids = marriage&&marriage.children&&marriage.children.length>0;
     const uid = 'm'+Math.random().toString(36).substr(2,9);
 
+    // Couple row — NO expand dot inside, it goes below centered
     const coupleRow = `<div class="couple-row">
       ${selfCard}
       ${marriage&&marriage.spouse?`<span class="plus">+</span>${makeCard(marriage.spouse,true)}`:''}
     </div>`;
 
-    if(!hasKids){
-      return `<div class="person-node">${coupleRow}</div>`;
-    }
+    if(!hasKids) return `<div class="person-node">${coupleRow}</div>`;
 
     return `<div class="person-node">
       ${coupleRow}
-      <div class="v-stem" style="height:8px"></div>
-      <div class="expand-dot" onclick="toggleFamily('${uid}')">+</div>
-      <div class="v-stem" style="height:8px"></div>
+      <div class="v-stem" style="height:6px"></div>
+      <div class="expand-dot" onclick="toggleFamily('${uid}')" title="Show children">+</div>
+      <div class="v-stem" style="height:6px"></div>
       ${renderChildrenSection(marriage.children, uid)}
     </div>`;
   }
 
-  // Multiple marriages OR bioChild: stack marriages vertically, each with its own children
+  // Multiple marriages or bio child
   let blocksHTML = '';
 
-  // Bio child shown as a side callout above marriages
   if(hasBio){
     const bc = person.bioChild;
     const bcUid = 'bc'+Math.random().toString(36).substr(2,9);
@@ -447,14 +499,15 @@ function renderPerson(person){
         <div class="bio-connector"></div>
         <div style="display:flex;flex-direction:column;align-items:center">
           <div class="card blood${bc.unknown?' unknown':''}${bc.deceased?' deceased':''}">
+            <div class="name-tip">${bc.name}</div>
             ${bc.nickname?`<span class="nickname">${bc.nickname}</span>`:''}
             <span class="fullname">${bc.name}</span>
             ${bc.deceased?doveMark():''}
             <span class="bio-tag">${bc.bioTag}</span>
           </div>
-          ${bcKids?`<div class="v-stem" style="height:8px"></div>
+          ${bcKids?`<div class="v-stem" style="height:6px"></div>
           <div class="expand-dot" onclick="toggleFamily('${bcUid}')">+</div>
-          <div class="v-stem" style="height:8px"></div>
+          <div class="v-stem" style="height:6px"></div>
           ${renderChildrenSection(bcChildren,bcUid)}`:''}
         </div>
       </div>`;
@@ -464,20 +517,18 @@ function renderPerson(person){
     const mUid = 'm'+Math.random().toString(36).substr(2,9);
     const hasKids = marriage.children&&marriage.children.length>0;
     const isMulti = marriages.length>1;
-
     blocksHTML += `
       <div class="marriage-block">
-        ${isMulti?`<div class="marriage-label">Partnership ${idx+1}</div>`:''}
-        ${isMulti&&idx>0?`<div class="marriage-divider"></div>`:''}
+        ${isMulti&&idx>0?`<div class="marriage-divider"></div><div class="marriage-label">Partnership ${idx+1}</div>`:''}
+        ${isMulti&&idx===0?`<div class="marriage-label">Partnership 1</div>`:''}
         <div class="couple-row">
-          ${idx===0?selfCard:'<div style="width:108px;min-width:76px"></div>'}
+          ${idx===0?selfCard:`<div style="width:92px;flex-shrink:0"></div>`}
           ${marriage.spouse?`<span class="plus">+</span>${makeCard(marriage.spouse,true)}`:''}
         </div>
-        ${hasKids?`
-          <div class="v-stem" style="height:8px"></div>
-          <div class="expand-dot" onclick="toggleFamily('${mUid}')">+</div>
-          <div class="v-stem" style="height:8px"></div>
-          ${renderChildrenSection(marriage.children,mUid)}`:''}
+        ${hasKids?`<div class="v-stem" style="height:6px"></div>
+        <div class="expand-dot" onclick="toggleFamily('${mUid}')">+</div>
+        <div class="v-stem" style="height:6px"></div>
+        ${renderChildrenSection(marriage.children,mUid)}`:''}
       </div>`;
   });
 
@@ -490,14 +541,22 @@ function toggleFamily(uid){
   const section=document.getElementById(uid);if(!section)return;
   const hidden=section.classList.contains('hidden');
   section.classList.toggle('hidden');
-  // Find the expand-dot just before this section (walk up siblings)
-  let el=section.previousElementSibling;
-  while(el&&!el.classList.contains('expand-dot'))el=el.previousElementSibling;
-  if(el){el.textContent=hidden?'−':'+';el.classList.toggle('open',hidden);}
+  // Find the matching expand-dot by data or walk siblings/parents
+  const dot=document.querySelector(`.expand-dot[onclick*="${uid}"]`);
+  if(dot){dot.textContent=hidden?'−':'+';dot.classList.toggle('open',hidden);}
 }
 
-function openMeals(e,name,meals){
+// Delegated meal button handler — avoids all JSON/quote escaping issues
+document.getElementById('treeWrap').addEventListener('click',function(e){
+  const btn=e.target.closest('.meal-btn');
+  if(!btn)return;
   e.stopPropagation();
+  const name=btn.getAttribute('data-name');
+  const meals=JSON.parse(btn.getAttribute('data-meals'));
+  openMeals(name,meals);
+});
+
+function openMeals(name,meals){
   document.getElementById('modalTitle').textContent=name+"'s Favorite Meals";
   const list=document.getElementById('modalMeals');list.innerHTML='';
   const count=Math.max(meals.length,3);
@@ -511,6 +570,10 @@ function openMeals(e,name,meals){
 }
 function closeMeals(){document.getElementById('mealModal').classList.remove('open');}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMeals();});
+
+document.addEventListener('touchstart',()=>{
+  document.querySelectorAll('.card.tip-open').forEach(c=>c.classList.remove('tip-open'));
+});
 
 async function submitSuggestion(){
   const msg=document.getElementById('sugMessage').value.trim();
