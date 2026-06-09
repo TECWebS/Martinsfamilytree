@@ -2,338 +2,137 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>The Martins Family Tree</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Nunito:wght@400;600;700&display=swap');
-
   :root {
-    --bark:        #5C3D2E;
-    --bark-light:  #7A5544;
-    --leaf:        #3A7D44;
-    --leaf-light:  #5AA85F;
-    --cream:       #FDF8F1;
-    --gold:        #D4A017;
-    --rose:        #C0616B;
-    --text:        #2E1F0F;
-    --muted:       #8A7060;
-    --card-bg:     #FFFDF8;
-    --shadow:      rgba(92,61,46,0.15);
-    --deceased-bg: #EEF2F7;
-    --deceased-border: #9BADC0;
-    --deceased-text:   #4A5568;
-    --connector:   #5AA85F;
+    --bark:#5C3D2E;--bark-light:#7A5544;--leaf:#3A7D44;--leaf-light:#5AA85F;
+    --cream:#FDF8F1;--gold:#D4A017;--rose:#C0616B;--text:#2E1F0F;--muted:#8A7060;
+    --card-bg:#FFFDF8;--shadow:rgba(92,61,46,0.15);
+    --deceased-bg:#EEF2F7;--deceased-border:#9BADC0;--deceased-text:#4A5568;
+    --connector:#5AA85F;
   }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;overflow-x:hidden;}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* HERO */
+  .hero{background:linear-gradient(160deg,var(--bark) 0%,var(--bark-light) 55%,var(--leaf) 100%);padding:40px 16px 60px;text-align:center;position:relative;overflow:hidden;}
+  .hero-wave{position:absolute;bottom:0;left:0;width:100%;pointer-events:none;}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,6vw,3.6rem);color:#fff;line-height:1.15;text-shadow:0 2px 10px rgba(0,0,0,.35);}
+  .hero-sub{margin-top:10px;color:rgba(255,255,255,.82);font-size:clamp(.8rem,3vw,1.05rem);font-style:italic;}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px;}
+  .legend-item{background:rgba(255,255,255,.16);border-radius:20px;padding:4px 10px;color:#fff;font-size:.75rem;display:flex;align-items:center;gap:6px;}
 
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--cream);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: auto;
-  }
+  /* TREE */
+  .tree-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:30px 12px 60px;}
+  .scroll-hint{text-align:center;font-size:.75rem;color:var(--muted);padding:8px 0 0;font-style:italic;}
+  @media(min-width:700px){.scroll-hint{display:none;}}
+  .level{display:flex;justify-content:center;}
 
-  /* ── HERO ── */
-  .hero {
-    background: linear-gradient(160deg, var(--bark) 0%, var(--bark-light) 55%, var(--leaf) 100%);
-    padding: 50px 24px 64px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero-wave {
-    position: absolute; bottom: 0; left: 0; width: 100%; pointer-events: none;
-  }
-  .hero h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 5vw, 3.6rem);
-    color: #fff;
-    line-height: 1.15;
-    text-shadow: 0 2px 10px rgba(0,0,0,.35);
-  }
-  .hero-sub {
-    margin-top: 10px;
-    color: rgba(255,255,255,.82);
-    font-size: 1.05rem;
-    font-style: italic;
-  }
-  .legend {
-    display: flex; flex-wrap: wrap; gap: 12px;
-    justify-content: center; margin-top: 22px;
-  }
-  .legend-item {
-    background: rgba(255,255,255,.16);
-    border-radius: 20px;
-    padding: 5px 14px;
-    color: #fff;
-    font-size: .8rem;
-    display: flex; align-items: center; gap: 7px;
-  }
+  /* PERSON NODE */
+  .person-node{display:flex;flex-direction:column;align-items:flex-start;padding:0 4px;}
+  .multi-spouse-row{display:flex;align-items:flex-start;gap:0;}
+  .person-self{display:flex;flex-direction:column;align-items:center;}
+  .marriages-col{display:flex;flex-direction:column;gap:8px;margin-left:0;}
+  .marriage-unit{display:flex;flex-direction:column;align-items:flex-start;}
+  .marriage-header{display:flex;align-items:center;gap:3px;flex-wrap:nowrap;}
+  .spouse-connector{height:2px;background:var(--connector);width:14px;flex-shrink:0;align-self:center;}
+  .marriage-label{font-size:.58rem;color:var(--muted);font-style:italic;margin-bottom:2px;padding-left:14px;white-space:nowrap;}
 
-  /* ══════════════════════════════════════
-     TREE LAYOUT — centered, top-down fan
-  ══════════════════════════════════════ */
-  .tree-wrap {
-    width: 100%;
-    overflow-x: auto;
-    padding: 40px 20px 60px;
-  }
+  .expand-dot{width:18px;height:18px;border-radius:50%;background:var(--leaf);color:#fff;font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin-left:4px;cursor:pointer;transition:background .2s,transform .2s;flex-shrink:0;line-height:1;}
+  .expand-dot:hover{background:var(--bark);transform:scale(1.15);}
+  .expand-dot.open{background:var(--rose);}
+  .plus{font-size:1rem;color:var(--bark-light);font-weight:700;padding:0 2px;align-self:center;flex-shrink:0;}
 
-  /* Each generation level */
-  .level {
-    display: flex;
-    justify-content: center;
-    gap: 0;
-    position: relative;
-  }
+  .children-row{display:flex;justify-content:flex-start;align-items:flex-start;flex-wrap:wrap;gap:6px;margin-top:6px;padding:0 4px;}
+  .children-row.hidden{display:none;}
 
-  /* A family unit = couple + their subtree */
-  .family {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    padding: 0 8px;
-  }
+  /* CARDS */
+  .card{display:inline-flex;flex-direction:column;align-items:center;background:var(--card-bg);border:2px solid var(--bark-light);border-radius:14px;padding:7px 9px;cursor:pointer;box-shadow:0 2px 8px var(--shadow);transition:transform .18s,box-shadow .18s,border-color .18s;width:108px;min-width:76px;max-width:118px;text-align:center;user-select:none;word-break:break-word;overflow-wrap:break-word;white-space:normal;}
+  @media(max-width:480px){.card{width:88px;min-width:70px;max-width:96px;padding:5px 6px;border-radius:11px;}}
+  .card:hover{transform:translateY(-2px);box-shadow:0 6px 18px var(--shadow);border-color:var(--leaf);}
+  .card.blood{border-color:var(--bark);background:linear-gradient(135deg,#fffdf8,#f6efe2);}
+  .card.spouse{border-color:var(--leaf-light);background:linear-gradient(135deg,#f5fbf5,#e8f5e9);}
+  .card.root{border-color:var(--gold);background:linear-gradient(135deg,#fffde7,#fff3cd);box-shadow:0 4px 16px rgba(212,160,23,.25);}
+  .card.unknown{border-style:dotted;opacity:.8;}
+  .card.deceased{background:var(--deceased-bg) !important;border-color:var(--deceased-border) !important;}
+  .card.no-children{cursor:default;}
+  .card.no-children:hover{transform:none;box-shadow:0 2px 8px var(--shadow);}
+  .nickname{font-size:.67rem;font-style:italic;color:var(--rose);font-weight:700;line-height:1;margin-bottom:2px;}
+  .fullname{font-size:.77rem;font-weight:700;color:var(--text);line-height:1.3;word-break:break-word;}
+  .card.deceased .fullname{color:var(--deceased-text);}
+  .card.deceased .nickname{color:#7a8fa6;}
+  .candle-wrap{margin-top:4px;display:flex;align-items:center;justify-content:center;gap:3px;}
+  .candle-label{font-size:.57rem;color:var(--deceased-text);font-style:italic;}
+  .adopted-heart{display:inline-block;cursor:default;position:relative;margin-left:2px;}
+  .adopted-heart .tip{display:none;position:absolute;bottom:130%;left:50%;transform:translateX(-50%);background:var(--rose);color:#fff;font-size:.68rem;padding:3px 8px;border-radius:8px;white-space:nowrap;pointer-events:none;z-index:20;}
+  .adopted-heart:hover .tip{display:block;}
+  .adopted-note{font-size:.6rem;color:var(--rose);font-style:italic;margin-top:2px;line-height:1.3;word-break:break-word;}
+  .meal-btn{background:none;border:none;cursor:pointer;padding:2px;margin-top:3px;transition:transform .15s;display:flex;align-items:center;justify-content:center;}
+  .meal-btn:hover{transform:scale(1.25);}
+  .bio-tag{font-size:.6rem;font-style:italic;color:var(--rose);font-weight:700;background:rgba(192,97,107,.1);border:1px dashed var(--rose);border-radius:8px;padding:2px 5px;margin-top:3px;word-break:break-word;line-height:1.3;}
 
-  /* The couple row inside a family */
-  .couple-row {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    position: relative;
-    z-index: 2;
-  }
+  /* MODAL */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(46,31,15,.5);z-index:100;align-items:center;justify-content:center;padding:16px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--card-bg);border-radius:20px;padding:24px 20px;max-width:360px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.3);position:relative;border:3px solid var(--gold);}
+  .modal h2{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--bark);margin-bottom:5px;word-break:break-word;}
+  .modal .sub{font-size:.82rem;color:var(--muted);margin-bottom:16px;font-style:italic;}
+  .meal-list{list-style:none;}
+  .meal-list li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed #e8dcc8;font-size:.88rem;}
+  .meal-list li:last-child{border-bottom:none;}
+  .meal-empty{color:var(--muted);font-style:italic;font-size:.82rem;}
+  .modal-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted);}
+  .modal-close:hover{color:var(--rose);}
 
-  /* Connector lines */
-  /* Vertical line down from couple to horizontal bar */
-  .v-line {
-    width: 2px;
-    background: var(--connector);
-    margin: 0 auto;
-    transition: height .3s;
-  }
-  /* Horizontal bar spanning children */
-  .h-bar-wrap {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
-  .h-bar {
-    height: 2px;
-    background: var(--connector);
-    position: absolute;
-    top: 0;
-  }
-  /* Short vertical drop from h-bar to each child */
-  .child-drop {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .children-row {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 0;
-    position: relative;
-  }
-  .children-row.hidden { display: none; }
-
-  /* Connectors container above children row */
-  .connectors {
-    position: relative;
-    width: 100%;
-    height: 28px;
-  }
-
-  /* ── CARDS ── */
-  .card {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    background: var(--card-bg);
-    border: 2px solid var(--bark-light);
-    border-radius: 14px;
-    padding: 8px 12px;
-    cursor: pointer;
-    box-shadow: 0 2px 8px var(--shadow);
-    transition: transform .18s, box-shadow .18s, border-color .18s;
-    min-width: 88px;
-    max-width: 130px;
-    text-align: center;
-    user-select: none;
-    white-space: normal;
-  }
-  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px var(--shadow); border-color: var(--leaf); }
-  .card.blood  { border-color: var(--bark); background: linear-gradient(135deg,#fffdf8,#f6efe2); }
-  .card.spouse { border-color: var(--leaf-light); background: linear-gradient(135deg,#f5fbf5,#e8f5e9); }
-  .card.root   { border-color: var(--gold); background: linear-gradient(135deg,#fffde7,#fff3cd); box-shadow: 0 4px 16px rgba(212,160,23,.25); }
-  .card.unknown { border-style: dotted; opacity: .8; }
-  .card.deceased {
-    background: var(--deceased-bg) !important;
-    border-color: var(--deceased-border) !important;
-  }
-  .card.no-children { cursor: default; }
-  .card.no-children:hover { transform: none; box-shadow: 0 2px 8px var(--shadow); }
-
-  .nickname { font-size: .7rem; font-style: italic; color: var(--rose); font-weight: 700; line-height: 1; margin-bottom: 2px; }
-  .fullname  { font-size: .82rem; font-weight: 700; color: var(--text); line-height: 1.25; }
-  .card.deceased .fullname { color: var(--deceased-text); }
-  .card.deceased .nickname { color: #7a8fa6; }
-
-  .candle-wrap {
-    margin-top: 5px;
-    display: flex; align-items: center; justify-content: center; gap: 3px;
-  }
-  .candle-label { font-size: .58rem; color: var(--deceased-text); font-style: italic; }
-
-  /* Adopted */
-  .adopted-heart {
-    display: inline-block; cursor: default; position: relative; margin-left: 3px;
-  }
-  .adopted-heart .tip {
-    display: none; position: absolute; bottom: 130%; left: 50%;
-    transform: translateX(-50%);
-    background: var(--rose); color: #fff; font-size: .68rem;
-    padding: 3px 8px; border-radius: 8px; white-space: nowrap;
-    pointer-events: none; z-index: 20;
-  }
-  .adopted-heart:hover .tip { display: block; }
-  .adopted-note { font-size: .62rem; color: var(--rose); font-style: italic; margin-top: 2px; }
-
-  /* Meal button */
-  .meal-btn {
-    background: none; border: none; cursor: pointer;
-    padding: 2px; margin-top: 3px;
-    transition: transform .15s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .meal-btn:hover { transform: scale(1.25); }
-
-  /* Expand indicator */
-  .expand-dot {
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: var(--leaf);
-    color: #fff;
-    font-size: .75rem;
-    font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    margin: 4px auto 0;
-    cursor: pointer;
-    transition: background .2s, transform .2s;
-    line-height: 1;
-  }
-  .expand-dot:hover { background: var(--bark); transform: scale(1.15); }
-  .expand-dot.open { background: var(--rose); }
-
-  .plus { font-size: 1rem; color: var(--bark-light); font-weight: 700; padding: 0 2px; align-self: center; flex-shrink: 0; }
-
-  /* Bio-only callout */
-  .bio-tag {
-    font-size: .65rem; font-style: italic; color: var(--rose); font-weight: 700;
-    background: rgba(192,97,107,.1); border: 1px dashed var(--rose);
-    border-radius: 8px; padding: 2px 7px; margin-top: 3px;
-    white-space: nowrap;
-  }
-
-  /* ── MODAL ── */
-  .modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(46,31,15,.5); z-index: 100;
-    align-items: center; justify-content: center;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--card-bg); border-radius: 20px;
-    padding: 28px 30px; max-width: 360px; width: 92%;
-    box-shadow: 0 12px 40px rgba(0,0,0,.3);
-    position: relative; border: 3px solid var(--gold);
-  }
-  .modal h2 { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--bark); margin-bottom:5px; }
-  .modal .sub { font-size:.82rem; color:var(--muted); margin-bottom:16px; font-style:italic; }
-  .meal-list { list-style:none; }
-  .meal-list li { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px dashed #e8dcc8; font-size:.9rem; }
-  .meal-list li:last-child { border-bottom:none; }
-  .meal-empty { color:var(--muted); font-style:italic; font-size:.83rem; }
-  .modal-close { position:absolute; top:12px; right:14px; background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--muted); }
-  .modal-close:hover { color:var(--rose); }
-
-  /* ── SUGGESTION ── */
-  .suggestion-section {
-    background: linear-gradient(135deg, var(--bark) 0%, var(--bark-light) 100%);
-    padding: 44px 24px 52px;
-  }
-  .suggestion-inner { max-width: 680px; margin: 0 auto; text-align: center; }
-  .suggestion-inner h2 { font-family:'Playfair Display',serif; font-size:1.8rem; color:#fff; margin-bottom:8px; }
-  .suggestion-inner p { color:rgba(255,255,255,.8); margin-bottom:22px; font-size:.95rem; }
-  .suggestion-form { background:rgba(255,255,255,.1); border-radius:18px; padding:24px; text-align:left; }
-  .form-row { margin-bottom:14px; }
-  .form-row label { display:block; color:rgba(255,255,255,.9); font-size:.84rem; font-weight:700; margin-bottom:5px; }
-  .form-row input, .form-row select, .form-row textarea {
-    width:100%; background:rgba(255,255,255,.92); border:2px solid transparent;
-    border-radius:10px; padding:10px 13px; font-family:'Nunito',sans-serif;
-    font-size:.9rem; color:var(--text); transition:border-color .18s;
-  }
-  .form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline:none; border-color:var(--gold); }
-  .form-row textarea { min-height:100px; resize:vertical; }
-  .submit-btn {
-    width:100%; padding:13px; background:var(--gold); color:var(--bark);
-    border:none; border-radius:12px; font-family:'Nunito',sans-serif;
-    font-size:1rem; font-weight:700; cursor:pointer; transition:background .2s, transform .15s; margin-top:4px;
-  }
-  .submit-btn:hover { background:#e8b824; transform:translateY(-1px); }
-  .submit-confirm { display:none; margin-top:14px; background:rgba(255,255,255,.2); border-radius:10px; padding:12px 16px; color:#fff; font-size:.9rem; text-align:center; }
-  .submit-confirm.show { display:block; }
-
-  footer { text-align:center; padding:20px; font-size:.78rem; color:var(--muted); }
+  /* SUGGESTION */
+  .suggestion-section{background:linear-gradient(135deg,var(--bark) 0%,var(--bark-light) 100%);padding:40px 16px 50px;}
+  .suggestion-inner{max-width:680px;margin:0 auto;text-align:center;}
+  .suggestion-inner h2{font-family:'Playfair Display',serif;font-size:1.6rem;color:#fff;margin-bottom:8px;}
+  .suggestion-inner p{color:rgba(255,255,255,.8);margin-bottom:20px;font-size:.9rem;}
+  .suggestion-form{background:rgba(255,255,255,.1);border-radius:18px;padding:20px;text-align:left;}
+  .form-row{margin-bottom:14px;}
+  .form-row label{display:block;color:rgba(255,255,255,.9);font-size:.84rem;font-weight:700;margin-bottom:5px;}
+  .form-row input,.form-row select,.form-row textarea{width:100%;background:rgba(255,255,255,.92);border:2px solid transparent;border-radius:10px;padding:10px 13px;font-family:'Nunito',sans-serif;font-size:.9rem;color:var(--text);transition:border-color .18s;}
+  .form-row input:focus,.form-row select:focus,.form-row textarea:focus{outline:none;border-color:var(--gold);}
+  .form-row textarea{min-height:100px;resize:vertical;}
+  .submit-btn{width:100%;padding:13px;background:var(--gold);color:var(--bark);border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s,transform .15s;margin-top:4px;}
+  .submit-btn:hover{background:#e8b824;transform:translateY(-1px);}
+  .submit-confirm{display:none;margin-top:14px;background:rgba(255,255,255,.2);border-radius:10px;padding:12px 16px;color:#fff;font-size:.9rem;text-align:center;}
+  .submit-confirm.show{display:block;}
+  footer{text-align:center;padding:20px;font-size:.78rem;color:var(--muted);}
 </style>
 </head>
 <body>
-
-<!-- SVG symbol defs -->
 <svg width="0" height="0" style="position:absolute;overflow:hidden">
   <defs>
-    <!-- Warm simple candle -->
     <symbol id="candle" viewBox="0 0 20 30">
-      <!-- glow -->
       <ellipse cx="10" cy="8" rx="6" ry="6" fill="rgba(255,200,50,0.18)"/>
-      <!-- flame -->
       <path d="M10,2 Q13,5 12,9 Q11,12 10,11 Q9,12 8,9 Q7,5 10,2 Z" fill="#F59E0B"/>
       <path d="M10,4 Q11.5,6.5 11,9 Q10.5,11 10,10.5 Q9.5,11 9,9 Q8.5,6.5 10,4 Z" fill="#FDE68A"/>
-      <!-- wick -->
       <line x1="10" y1="11" x2="10" y2="14" stroke="#4A3728" stroke-width="1.2" stroke-linecap="round"/>
-      <!-- body -->
       <rect x="7" y="14" width="6" height="14" rx="2" fill="#FDE68A" stroke="#D4A017" stroke-width="1"/>
-      <!-- highlight -->
       <rect x="8.5" y="16" width="1.5" height="8" rx="0.7" fill="rgba(255,255,255,0.45)"/>
     </symbol>
-    <!-- Fork & knife -->
     <symbol id="fork-knife" viewBox="0 0 22 28">
       <line x1="5" y1="2" x2="5" y2="11" stroke="#5C3D2E" stroke-width="2" stroke-linecap="round"/>
       <line x1="9" y1="2" x2="9" y2="11" stroke="#5C3D2E" stroke-width="2" stroke-linecap="round"/>
       <path d="M5,11 Q7,15 7,26" stroke="#5C3D2E" stroke-width="2" fill="none" stroke-linecap="round"/>
       <path d="M15,2 Q21,2 21,9 Q21,13 15,13 L15,26" stroke="#5C3D2E" stroke-width="2" fill="none" stroke-linecap="round"/>
     </symbol>
-    <!-- Heart -->
     <symbol id="heart" viewBox="0 0 20 18">
       <path d="M10,16 L2,8 Q0,4 4,2 Q7,1 10,5 Q13,1 16,2 Q20,4 18,8 Z" fill="#C0616B"/>
     </symbol>
   </defs>
 </svg>
 
-<!-- ══ HERO ══ -->
 <div class="hero">
   <svg class="hero-wave" viewBox="0 0 1200 70" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
     <path d="M0,35 Q300,5 600,35 Q900,65 1200,35 L1200,70 L0,70 Z" fill="rgba(255,255,255,0.07)"/>
     <path d="M0,50 Q300,20 600,50 Q900,80 1200,50 L1200,70 L0,70 Z" fill="rgba(255,255,255,0.05)"/>
   </svg>
-  <svg width="82" height="82" viewBox="0 0 82 82" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:12px;filter:drop-shadow(0 3px 10px rgba(0,0,0,.3))">
+  <svg width="72" height="72" viewBox="0 0 82 82" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:10px;filter:drop-shadow(0 3px 10px rgba(0,0,0,.3))">
     <ellipse cx="41" cy="33" rx="27" ry="24" fill="#3A7D44"/>
     <ellipse cx="26" cy="39" rx="17" ry="14" fill="#5AA85F"/>
     <ellipse cx="56" cy="37" rx="17" ry="14" fill="#5AA85F"/>
@@ -348,33 +147,17 @@
   <h1>The Martins Family Tree</h1>
   <p class="hero-sub">Rooted in love · Honoring every branch · Growing through generations</p>
   <div class="legend">
-    <div class="legend-item">
-      <svg width="13" height="13" viewBox="0 0 13 13"><rect x="1" y="1" width="11" height="11" rx="3" fill="#D4A017"/></svg>
-      Blood — Martin line
-    </div>
-    <div class="legend-item">
-      <svg width="13" height="13" viewBox="0 0 13 13"><rect x="1" y="1" width="11" height="11" rx="3" fill="#5AA85F"/></svg>
-      Married in
-    </div>
-    <div class="legend-item">
-      <svg width="16" height="24" viewBox="0 0 20 30"><use href="#candle"/></svg>
-      At rest
-    </div>
-    <div class="legend-item">
-      <svg width="16" height="20" viewBox="0 0 22 28"><use href="#fork-knife"/></svg>
-      Favorite meals
-    </div>
-    <div class="legend-item">
-      <svg width="14" height="13" viewBox="0 0 20 18"><use href="#heart"/></svg>
-      Adopted with love
-    </div>
+    <div class="legend-item"><svg width="13" height="13" viewBox="0 0 13 13"><rect x="1" y="1" width="11" height="11" rx="3" fill="#D4A017"/></svg>Blood — Martin line</div>
+    <div class="legend-item"><svg width="13" height="13" viewBox="0 0 13 13"><rect x="1" y="1" width="11" height="11" rx="3" fill="#5AA85F"/></svg>Married in</div>
+    <div class="legend-item"><svg width="14" height="21" viewBox="0 0 20 30"><use href="#candle"/></svg>At rest</div>
+    <div class="legend-item"><svg width="14" height="18" viewBox="0 0 22 28"><use href="#fork-knife"/></svg>Favorite meals</div>
+    <div class="legend-item"><svg width="13" height="12" viewBox="0 0 20 18"><use href="#heart"/></svg>Adopted with love</div>
   </div>
 </div>
 
-<!-- ══ TREE ══ -->
+<p class="scroll-hint">← Scroll sideways to explore the full tree →</p>
 <div class="tree-wrap" id="treeWrap"></div>
 
-<!-- ══ SUGGESTION BOX ══ -->
 <div class="suggestion-section">
   <div class="suggestion-inner">
     <svg width="54" height="42" viewBox="0 0 54 42" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:12px">
@@ -386,12 +169,8 @@
     <h2>Help Us Fill in the Blanks!</h2>
     <p>Missing a name? Know what Grandma used to cook? Have a story or a correction? Drop it here — every piece helps us grow this tree together. 🌱</p>
     <div class="suggestion-form">
-      <div class="form-row">
-        <label>Your Name (optional)</label>
-        <input type="text" id="sugName" placeholder="e.g. Cousin Tasha">
-      </div>
-      <div class="form-row">
-        <label>Type of Update</label>
+      <div class="form-row"><label>Your Name (optional)</label><input type="text" id="sugName" placeholder="e.g. Cousin Tasha"></div>
+      <div class="form-row"><label>Type of Update</label>
         <select id="sugType">
           <option value="">— Select one —</option>
           <option value="missing_name">Missing name / unknown person</option>
@@ -403,36 +182,25 @@
           <option value="other">Other</option>
         </select>
       </div>
-      <div class="form-row">
-        <label>Who is this about?</label>
-        <input type="text" id="sugPerson" placeholder="e.g. Lena Moseby, or the ?? Higgins branch">
-      </div>
-      <div class="form-row">
-        <label>Your Message</label>
-        <textarea id="sugMessage" placeholder="Share what you know — every story matters…"></textarea>
-      </div>
+      <div class="form-row"><label>Who is this about?</label><input type="text" id="sugPerson" placeholder="e.g. Lena Moseby, or the ?? Higgins branch"></div>
+      <div class="form-row"><label>Your Message</label><textarea id="sugMessage" placeholder="Share what you know — every story matters…"></textarea></div>
       <button class="submit-btn" onclick="submitSuggestion()">
         <svg width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px"><path d="M2,3 L22,12 L2,21 L2,14 L16,12 L2,10 Z" fill="#5C3D2E"/></svg>
         Send to the Family Tree
       </button>
-      <div class="submit-confirm" id="submitConfirm">
-        🌳 Thank you! Your message has been noted and will help complete our family history.
-      </div>
+      <div class="submit-confirm" id="submitConfirm">🌳 Thank you! Your message has been noted and will help complete our family history.</div>
     </div>
   </div>
 </div>
 
 <footer>
   <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:5px">
-    <ellipse cx="12" cy="9" rx="7" ry="6" fill="#3A7D44"/>
-    <ellipse cx="7" cy="11" rx="4" ry="3.5" fill="#5AA85F"/>
-    <ellipse cx="17" cy="10" rx="4" ry="3.5" fill="#5AA85F"/>
-    <rect x="10.5" y="15" width="3" height="7" rx="1.5" fill="#5C3D2E"/>
+    <ellipse cx="12" cy="9" rx="7" ry="6" fill="#3A7D44"/><ellipse cx="7" cy="11" rx="4" ry="3.5" fill="#5AA85F"/>
+    <ellipse cx="17" cy="10" rx="4" ry="3.5" fill="#5AA85F"/><rect x="10.5" y="15" width="3" height="7" rx="1.5" fill="#5C3D2E"/>
   </svg>
   The Martins Family Tree · Made with love · Help us grow it 🌱
 </footer>
 
-<!-- ══ MEAL MODAL ══ -->
 <div class="modal-overlay" id="mealModal" onclick="if(event.target===this)closeMeals()">
   <div class="modal">
     <button class="modal-close" onclick="closeMeals()">✕</button>
@@ -443,461 +211,296 @@
 </div>
 
 <script>
-/* ══════════════════════════════════════════════
-   DATA — family tree structure
-══════════════════════════════════════════════ */
 const TREE = {
-  blood: true, deceased: true, root: true,
-  nickname: 'Momma', name: 'Maggie Woods',
-  spouse: { name: 'German Martin', nickname: 'Poppa', deceased: true },
-  children: [
-    {
-      blood: true, deceased: true, name: 'Dennis Martin',
-      spouse: { name: 'Ethel', deceased: true },
-      children: [
-        { blood: true, name: '?', unknown: true }
-      ]
-    },
-    {
-      blood: true, deceased: true, nickname: 'Mae-Mae', name: 'Martin',
-      spouse: { name: 'John Moseby', deceased: true },
-      children: [
-        // Lena + Norman
-        {
-          blood: true, deceased: true, nickname: 'Dolly', name: 'Lena Moseby',
-          meals: ['?','?','?'], mealPerson: 'Lena Moseby',
-          spouse: { name: 'Norman Collins' },
-          children: [
-            {
-              blood: true, name: 'Norman Collins II', meals: ['?','?','?'], mealPerson: 'Norman Collins II',
-              spouse: { name: 'Doreen' },
-              children: [
-                { blood: true, deceased: true, name: 'Warren' },
-                { blood: true, nickname: 'Little Norman', name: 'Norman Collins III' }
-              ]
-            },
-            {
-              blood: true, name: 'Denis Collins', meals: ['?','?','?'], mealPerson: 'Denis Collins',
-              children: [{ blood: true, name: '?', unknown: true }]
-            }
-          ]
+  blood:true,deceased:true,root:true,nickname:'Momma',name:'Maggie Woods',
+  marriages:[{
+    spouse:{name:'German Martin',nickname:'Poppa',deceased:true},
+    children:[
+      // Dennis
+      {blood:true,deceased:true,name:'Dennis Martin',
+       marriages:[{spouse:{name:'Ethel',deceased:true},children:[{blood:true,name:'?',unknown:true}]}]},
+      // Mae-Mae
+      {blood:true,deceased:true,nickname:'Mae-Mae',name:'Martin',
+       marriages:[{
+         spouse:{name:'John Moseby',deceased:true},
+         children:[
+           // Lena — one node, 5 marriages
+           {
+             blood:true,deceased:true,nickname:'Dolly',name:'Lena Moseby',
+             meals:['Lasagna','Fried Chicken','Fried Pork Chops','Fried Potatoes & Onions','Salisbury Steak'],
+             marriages:[
+               // 1. Norman Collins
+               {spouse:{name:'Norman Collins'},children:[
+                 {blood:true,name:'Norman Collins II',meals:['?','?','?'],marriages:[
+                   {spouse:{name:'Doreen'},children:[
+                     {blood:true,deceased:true,name:'Warren'},
+                     {blood:true,nickname:'Little Norman',name:'Norman Collins III'}
+                   ]}
+                 ]},
+                 {blood:true,name:'Denis Collins',meals:['?','?','?'],marriages:[
+                   {spouse:null,children:[{blood:true,name:'?',unknown:true}]}
+                 ]}
+               ]},
+               // 2. Unknown (??)
+               {spouse:{name:'??',unknown:true},children:[
+                 {
+                   blood:true,name:'Pamela Hunt',
+                   meals:['Tacos','Spaghetti','Fried Fish'],
+                   marriages:[
+                     {spouse:{name:'Herbert John Wesley',deceased:true},children:[
+                       {blood:true,name:'Wesley Jermaine Collins',marriages:[
+                         {spouse:{name:'Jasmine Collins'},children:[{blood:true,nickname:'Little Wes',name:'Wesley Jermaine Collins II'}]}
+                       ]}
+                     ]},
+                     {spouse:{name:'Roderick Garnet Hunt'},children:[
+                       {blood:true,nickname:'RJ',name:'Roderick Garnet Hunt II',marriages:[
+                         {spouse:{name:'Danielle Degrate'},children:[{blood:true,name:'Raeannah Hunt'}]},
+                         {spouse:{name:'Amanda Howard'},children:[
+                           {blood:true,name:'Josiyah Garnet Hunt'},{blood:true,name:'Jaliyah Hunt'},{blood:true,name:'Janiyah Hunt'}
+                         ]},
+                         {spouse:{name:'Jennifer Hall'},children:[
+                           {blood:true,name:'Jada Hunt'},{blood:true,name:'Jahari Hunt'}
+                         ]}
+                       ]}
+                     ]},
+                     {spouse:{name:'Charles Edwards',nickname:'Zeek',deceased:true},children:[
+                       {blood:true,name:'Tashanna Edwards'},{blood:true,name:'Tiraa Edwards'}
+                     ]},
+                     {spouse:{name:'Luis Anderson'},children:[
+                       {blood:true,name:'Tianna Edwards',marriages:[
+                         {spouse:{name:'Besim Collom'},children:[{blood:true,name:'Nalla Collom'}]}
+                       ]}
+                     ]},
+                     {spouse:{name:'Malik Jones'},children:[{blood:true,nickname:'Joshua',name:'Yehoshua Yehudah'}]},
+                     {spouse:{name:'Robert Ford',nickname:'Kevin Kelly'},children:[
+                       {blood:true,name:'Tyrique Edwards',marriages:[
+                         {spouse:{name:'Nafysa Edwards'},children:[{blood:true,name:'?',unknown:true}]}
+                       ]}
+                     ]},
+                     {spouse:{name:'Andre Vegas Jr.'},children:[{blood:true,name:'Tyicia Edwards'}]}
+                   ]
+                 }
+               ]},
+               // 3. ?? Higgins
+               {spouse:{name:'?? Higgins',unknown:true},children:[
+                 {blood:true,name:'Darlene Duncan',meals:['?','?','?'],marriages:[
+                   {spouse:{name:'Ellis Duncan'},children:[
+                     {blood:true,name:'Nicole Duncan',marriages:[
+                       {spouse:{name:'Nate Butler'},children:[{blood:true,name:'Nehalani Butler'}]},
+                       {spouse:{name:'Omari Benson'},children:[{blood:true,name:'Mistah Benson'}]}
+                     ]},
+                     {blood:true,name:'Michelle Duncan',marriages:[
+                       {spouse:{name:'Jah…',unknown:true},children:[{blood:true,name:'Love M.'}]},
+                       {spouse:{name:'Chester'},children:[{blood:true,name:'Grey Duncan'}]}
+                     ]},
+                     {blood:true,name:'Sherell Duncan',marriages:[
+                       {spouse:{name:'Marcy Baretto'},children:[{blood:true,name:'Amayah Baretto'}]},
+                       {spouse:{name:'??',unknown:true},children:[{blood:true,name:'Zacari'}]}
+                     ]}
+                   ]}
+                 ]}
+               ]},
+               // 4. Lemuel Pearsall
+               {spouse:{name:'Lemuel Pearsall',deceased:true},children:[
+                 {blood:true,name:'Michael Collins',meals:['?','?','?'],marriages:[
+                   {spouse:{name:'Eloise Collins',nickname:'Debby'},children:[
+                     {blood:true,name:'Antwon',adopted:true,adoptedBy:'Michael Collins'},
+                     {blood:true,name:'Ricardo',adopted:true,adoptedBy:'Michael Collins'},
+                     {blood:true,name:'Lakita',adopted:true,adoptedBy:'Michael Collins'}
+                   ]}
+                 ]}
+               ]},
+               // 5. William Ruff
+               {spouse:{name:'William Ruff',deceased:true},children:[
+                 {blood:true,name:'Sherell Hunter',meals:['?','?','?'],marriages:[
+                   {spouse:{name:'Bryan Hunter'},children:[
+                     {blood:true,name:'Imanni Hunter'},{blood:true,name:'Imarra Hunter'},{blood:true,name:'Imannuel Hunter'}
+                   ]}
+                 ]}
+               ]}
+             ]
+           }
+         ]
+       }]},
+      // Tia
+      {blood:true,deceased:true,nickname:'Tia',name:'Artelia Martin',
+       marriages:[{spouse:{name:'Leo Jackson',deceased:true},children:[{blood:true,name:'Delores'}]}]},
+      // Lindsey
+      {blood:true,deceased:true,name:'Lindsey Martin',
+       marriages:[{spouse:{name:'Martha',deceased:true},children:[
+         {blood:true,name:'Michael Martin',marriages:[{spouse:null,children:[
+           {blood:true,name:'Adopted Child 1',adopted:true,adoptedBy:'Michael Martin',unknown:true},
+           {blood:true,name:'Adopted Child 2',adopted:true,adoptedBy:'Michael Martin',unknown:true}
+         ]}]}
+       ]}]},
+      // Herman
+      {
+        blood:true,deceased:true,name:'Herman Martin',
+        bioChild:{
+          bioTag:"Herman's biological child · other relationship",
+          blood:true,name:'James ??',
+          marriages:[{spouse:null,children:[{blood:true,name:'Kids…',unknown:true}]}]
         },
-        // Lena + ??
-        {
-          blood: true, deceased: true, nickname: 'Dolly', name: 'Lena Moseby',
-          meals: ['?','?','?'], mealPerson: 'Lena Moseby',
-          spouse: { name: '??', unknown: true },
-          children: [
+        marriages:[{
+          spouse:{name:'Harriet',deceased:true},
+          children:[
+            {blood:true,name:'Vera',marriages:[{spouse:{name:'Don'},children:[
+              {blood:true,name:'Donna',marriages:[{spouse:{name:'??',unknown:true},children:[{blood:true,name:'?',unknown:true}]}]},
+              {blood:true,name:'Joey',marriages:[{spouse:{name:'??',unknown:true},children:[{blood:true,name:'?',unknown:true}]}]},
+              {blood:true,name:'Cathy',marriages:[{spouse:{name:'Earl Wilson'},children:[
+                {blood:true,nickname:'Little Earl',name:'Earl Wilson II',marriages:[{spouse:{name:'??',unknown:true},children:[{blood:true,name:'Kids',unknown:true}]}]},
+                {blood:true,name:'Tobias Wilson'}
+              ]}]}
+            ]}]},
             {
-              blood: true, name: 'Pamela Hunt', meals: ['?','?','?'], mealPerson: 'Pamela Hunt',
-              spouse: { name: 'Herbert John Wesley', deceased: true },
-              children: [
-                {
-                  blood: true, name: 'Wesley Jermaine Collins',
-                  spouse: { name: 'Jasmine Collins' },
-                  children: [{ blood: true, nickname: 'Little Wes', name: 'Wesley Jermaine Collins II' }]
-                }
-              ]
+              blood:true,name:'Leon',
+              bioChild:{bioTag:"Ann's biological child · family member",blood:true,name:'Jeffery'},
+              marriages:[{spouse:{name:'Ann'},children:[
+                {blood:true,nickname:'Little Leon',name:'Leon II'},
+                {blood:true,name:'Anthony'}
+              ]}]
             },
-            {
-              blood: true, name: 'Pamela Hunt', meals: ['?','?','?'], mealPerson: 'Pamela Hunt',
-              spouse: { name: 'Roderick Garnet Hunt' },
-              children: [
-                {
-                  blood: true, nickname: 'RJ', name: 'Roderick Garnet Hunt II',
-                  spouse: { name: 'Danielle Degrate' },
-                  children: [{ blood: true, name: 'Raeannah Hunt' }]
-                },
-                {
-                  blood: true, nickname: 'RJ', name: 'Roderick Garnet Hunt II',
-                  spouse: { name: 'Amanda Howard' },
-                  children: [
-                    { blood: true, name: 'Josiyah Garnet Hunt' },
-                    { blood: true, name: 'Jaliyah Hunt' },
-                    { blood: true, name: 'Janiyah Hunt' }
-                  ]
-                },
-                {
-                  blood: true, nickname: 'RJ', name: 'Roderick Garnet Hunt II',
-                  spouse: { name: 'Jennifer Hall' },
-                  children: [
-                    { blood: true, name: 'Jada Hunt' },
-                    { blood: true, name: 'Jahari Hunt' }
-                  ]
-                }
-              ]
-            },
-            {
-              blood: true, name: 'Pamela Hunt', meals: ['?','?','?'], mealPerson: 'Pamela Hunt',
-              spouse: { name: 'Charles Edwards', nickname: 'Zeek', deceased: true },
-              children: [
-                { blood: true, name: 'Tashanna Edwards' },
-                { blood: true, name: 'Tiraa Edwards' }
-              ]
-            },
-            {
-              blood: true, name: 'Pamela Hunt', meals: ['?','?','?'], mealPerson: 'Pamela Hunt',
-              spouse: { name: 'Luis Anderson' },
-              children: [
-                {
-                  blood: true, name: 'Tianna Edwards',
-                  spouse: { name: 'Besim Collom' },
-                  children: [{ blood: true, name: 'Nalla Collom' }]
-                }
-              ]
-            },
-            {
-              blood: true, name: 'Pamela Hunt', meals: ['?','?','?'], mealPerson: 'Pamela Hunt',
-              spouse: { name: 'Malik Jones' },
-              children: [{ blood: true, nickname: 'Joshua', name: 'Yehoshua Yehudah' }]
-            },
-            {
-              blood: true, name: 'Pamela Hunt', meals: ['?','?','?'], mealPerson: 'Pamela Hunt',
-              spouse: { name: 'Robert Ford', nickname: 'Kevin Kelly' },
-              children: [
-                {
-                  blood: true, name: 'Tyrique Edwards',
-                  spouse: { name: 'Nafysa Edwards' },
-                  children: [{ blood: true, name: '?', unknown: true }]
-                }
-              ]
-            },
-            {
-              blood: true, name: 'Pamela Hunt', meals: ['?','?','?'], mealPerson: 'Pamela Hunt',
-              spouse: { name: 'Andre Vegas Jr.' },
-              children: [{ blood: true, name: 'Tyicia Edwards' }]
-            }
+            {blood:true,name:'Peewee'}
           ]
-        },
-        // Lena + ?? Higgins
-        {
-          blood: true, deceased: true, nickname: 'Dolly', name: 'Lena Moseby',
-          meals: ['?','?','?'], mealPerson: 'Lena Moseby',
-          spouse: { name: '?? Higgins', unknown: true },
-          children: [
-            {
-              blood: true, name: 'Darlene Duncan', meals: ['?','?','?'], mealPerson: 'Darlene Duncan',
-              spouse: { name: 'Ellis Duncan' },
-              children: [
-                {
-                  blood: true, name: 'Nicole Duncan',
-                  spouse: { name: 'Nate Butler' },
-                  children: [{ blood: true, name: 'Nehalani Butler' }]
-                },
-                {
-                  blood: true, name: 'Nicole Duncan',
-                  spouse: { name: 'Omari Benson' },
-                  children: [{ blood: true, name: 'Mistah Benson' }]
-                },
-                {
-                  blood: true, name: 'Michelle Duncan',
-                  spouse: { name: 'Jah…', unknown: true },
-                  children: [{ blood: true, name: 'Love M.' }]
-                },
-                {
-                  blood: true, name: 'Michelle Duncan',
-                  spouse: { name: 'Chester' },
-                  children: [{ blood: true, name: 'Grey Duncan' }]
-                },
-                {
-                  blood: true, name: 'Sherell Duncan',
-                  spouse: { name: 'Marcy Baretto' },
-                  children: [{ blood: true, name: 'Amayah Baretto' }]
-                },
-                {
-                  blood: true, name: 'Sherell Duncan',
-                  spouse: { name: '??', unknown: true },
-                  children: [{ blood: true, name: 'Zacari' }]
-                }
-              ]
-            }
-          ]
-        },
-        // Lena + Lemuel Pearsall
-        {
-          blood: true, deceased: true, nickname: 'Dolly', name: 'Lena Moseby',
-          meals: ['?','?','?'], mealPerson: 'Lena Moseby',
-          spouse: { name: 'Lemuel Pearsall', deceased: true },
-          children: [
-            {
-              blood: true, name: 'Michael Collins', meals: ['?','?','?'], mealPerson: 'Michael Collins',
-              spouse: { name: 'Eloise Collins', nickname: 'Debby' },
-              children: [
-                { blood: true, name: 'Antwon', adopted: true, adoptedNote: "Eloise's · adopted by Michael" },
-                { blood: true, name: 'Ricardo', adopted: true, adoptedNote: "Eloise's · adopted by Michael" },
-                { blood: true, name: 'Lakita', adopted: true, adoptedNote: "Eloise's · adopted by Michael" }
-              ]
-            }
-          ]
-        },
-        // Lena + William Ruff
-        {
-          blood: true, deceased: true, nickname: 'Dolly', name: 'Lena Moseby',
-          meals: ['?','?','?'], mealPerson: 'Lena Moseby',
-          spouse: { name: 'William Ruff', deceased: true },
-          children: [
-            {
-              blood: true, name: 'Sherell Hunter', meals: ['?','?','?'], mealPerson: 'Sherell Hunter',
-              spouse: { name: 'Bryan Hunter' },
-              children: [
-                { blood: true, name: 'Imanni Hunter' },
-                { blood: true, name: 'Imarra Hunter' },
-                { blood: true, name: 'Imannuel Hunter' }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      blood: true, deceased: true, nickname: 'Tia', name: 'Artelia Martin',
-      spouse: { name: 'Leo Jackson', deceased: true },
-      children: [
-        { blood: true, name: 'Delores' }
-      ]
-    },
-    {
-      blood: true, deceased: true, name: 'Lindsey Martin',
-      spouse: { name: 'Martha', deceased: true },
-      children: [
-        {
-          blood: true, name: 'Michael Martin',
-          children: [
-            { blood: true, name: 'Adopted Child 1', adopted: true, adoptedNote: 'Name unknown', unknown: true },
-            { blood: true, name: 'Adopted Child 2', adopted: true, adoptedNote: 'Name unknown', unknown: true }
-          ]
-        }
-      ]
-    },
-    {
-      blood: true, deceased: true, name: 'Herman Martin',
-      spouse: { name: 'Harriet', deceased: true },
-      bioChild: {
-        bioTag: "Herman's biological child · other relationship",
-        blood: true, name: 'James ??',
-        children: [{ blood: true, name: 'Kids…', unknown: true }]
-      },
-      children: [
-        {
-          blood: true, name: 'Vera',
-          spouse: { name: 'Don' },
-          children: [
-            {
-              blood: true, name: 'Donna',
-              spouse: { name: '??', unknown: true },
-              children: [{ blood: true, name: '?', unknown: true }]
-            },
-            {
-              blood: true, name: 'Joey',
-              spouse: { name: '??', unknown: true },
-              children: [{ blood: true, name: '?', unknown: true }]
-            },
-            {
-              blood: true, name: 'Cathy',
-              spouse: { name: 'Earl Wilson' },
-              children: [
-                {
-                  blood: true, nickname: 'Little Earl', name: 'Earl Wilson II',
-                  spouse: { name: '??', unknown: true },
-                  children: [{ blood: true, name: 'Kids', unknown: true }]
-                },
-                { blood: true, name: 'Tobias Wilson' }
-              ]
-            }
-          ]
-        },
-        {
-          blood: true, name: 'Leon',
-          spouse: { name: 'Ann' },
-          bioChild: {
-            bioTag: "Ann's biological child · family member",
-            blood: true, name: 'Jeffery'
-          },
-          children: [
-            { blood: true, nickname: 'Little Leon', name: 'Leon II' },
-            { blood: true, name: 'Anthony' }
-          ]
-        },
-        { blood: true, name: 'Peewee' }
-      ]
-    }
-  ]
+        }]
+      }
+    ]
+  }]
 };
 
-/* ══════════════════════════════════════════════
-   RENDER ENGINE
-══════════════════════════════════════════════ */
+/* RENDER */
+function candleSVG(s=14){return `<svg width="${s}" height="${s*1.5}" viewBox="0 0 20 30"><use href="#candle"/></svg>`;}
+function forkSVG(){return `<svg width="14" height="18" viewBox="0 0 22 28"><use href="#fork-knife"/></svg>`;}
+function heartSVG(){return `<svg width="11" height="10" viewBox="0 0 20 18"><use href="#heart"/></svg>`;}
 
-let expandedNodes = new Set();
-
-function candleSVG(size=20) {
-  const h = size * 1.5;
-  return `<svg width="${size}" height="${h}" viewBox="0 0 20 30"><use href="#candle"/></svg>`;
+function makeCard(person,isSpouse){
+  const cls=['card'];
+  if(person.root)cls.push('root');
+  if(person.blood&&!isSpouse)cls.push('blood');
+  if(isSpouse)cls.push('spouse');
+  if(person.deceased)cls.push('deceased');
+  if(person.unknown)cls.push('unknown');
+  const hasKids=!isSpouse&&((person.marriages&&person.marriages.some(m=>m.children&&m.children.length))||person.bioChild);
+  if(!hasKids&&!(person.meals&&!isSpouse))cls.push('no-children');
+  let h='';
+  if(person.nickname)h+=`<span class="nickname">${person.nickname}</span>`;
+  let n=person.name;
+  if(person.adopted)n+=` <span class="adopted-heart">${heartSVG()}<span class="tip">Adopted with love</span></span>`;
+  h+=`<span class="fullname">${n}</span>`;
+  if(person.adopted&&person.adoptedBy)h+=`<span class="adopted-note">Adopted by ${person.adoptedBy}</span>`;
+  if(person.deceased)h+=`<div class="candle-wrap">${candleSVG()}<span class="candle-label">At rest</span></div>`;
+  if(!isSpouse&&person.meals){
+    const mj=JSON.stringify(person.meals).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    h+=`<button class="meal-btn" onclick="openMeals(event,'${(person.name||'').replace(/'/g,"\\'")}',${mj})" title="Favorite meals">${forkSVG()}</button>`;
+  }
+  return `<div class="${cls.join(' ')}">${h}</div>`;
 }
 
-function forkKnifeSVG() {
-  return `<svg width="16" height="20" viewBox="0 0 22 28"><use href="#fork-knife"/></svg>`;
-}
+function renderPerson(person){
+  const marriages=person.marriages||[];
+  const hasBio=!!person.bioChild;
+  const hasExpandable=hasBio||marriages.some(m=>m.children&&m.children.length>0);
 
-function heartSVG() {
-  return `<svg width="13" height="12" viewBox="0 0 20 18"><use href="#heart"/></svg>`;
-}
+  const selfCard=makeCard(person,false);
 
-function makeCard(person, isSpouse) {
-  const classes = ['card'];
-  if (person.root) classes.push('root');
-  if (person.blood && !isSpouse) classes.push('blood');
-  if (isSpouse) classes.push('spouse');
-  if (person.deceased) classes.push('deceased');
-  if (person.unknown) classes.push('unknown');
-  const hasChildren = !!(person.children && person.children.length) || !!(person.bioChild);
-  if (!hasChildren && !person.meals) classes.push('no-children');
-
-  let inner = '';
-  if (person.nickname) inner += `<span class="nickname">${person.nickname}</span>`;
-  let nameHtml = person.name;
-  if (person.adopted) {
-    nameHtml += ` <span class="adopted-heart">${heartSVG()}<span class="tip">Adopted with love</span></span>`;
-  }
-  inner += `<span class="fullname">${nameHtml}</span>`;
-  if (person.adopted && person.adoptedNote) {
-    inner += `<span class="adopted-note">${person.adoptedNote}</span>`;
-  }
-  if (person.deceased) {
-    inner += `<div class="candle-wrap">${candleSVG(16)}<span class="candle-label">At rest</span></div>`;
-  }
-  if (person.meals) {
-    inner += `<button class="meal-btn" onclick="openMeals(event,'${person.mealPerson || person.name}',${JSON.stringify(person.meals)})" title="Favorite meals">${forkKnifeSVG()}</button>`;
+  if(!hasExpandable){
+    if(marriages.length===1&&marriages[0].spouse){
+      return `<div class="person-node"><div class="multi-spouse-row"><div class="person-self">${selfCard}</div><span class="plus">+</span>${makeCard(marriages[0].spouse,true)}</div></div>`;
+    }
+    return `<div class="person-node"><div class="multi-spouse-row"><div class="person-self">${selfCard}</div></div></div>`;
   }
 
-  const clickable = hasChildren;
-  const onclick = clickable ? `onclick="toggleNode(this)"` : '';
-  return `<div class="${classes.join(' ')}" ${onclick} data-id="${Math.random().toString(36).substr(2,9)}">${inner}</div>`;
-}
+  let mHTML='';
 
-function renderFamily(person, depth) {
-  const hasChildren = (person.children && person.children.length > 0) || person.bioChild;
-  const uid = 'n' + Math.random().toString(36).substr(2,9);
-
-  // Couple row
-  let coupleHTML = `<div class="couple-row">`;
-  coupleHTML += makeCard(person, false);
-  if (person.spouse) {
-    coupleHTML += `<span class="plus">+</span>`;
-    coupleHTML += makeCard(person.spouse, true);
-  }
-  coupleHTML += `</div>`;
-
-  if (!hasChildren) {
-    return `<div class="family">${coupleHTML}</div>`;
-  }
-
-  // Expand dot
-  coupleHTML += `<div class="expand-dot" onclick="toggleFamily('${uid}')" title="Expand/collapse">+</div>`;
-
-  // Build children
-  let allChildren = [];
-
-  // Bio child callout
-  if (person.bioChild) {
-    const bc = person.bioChild;
-    allChildren.push(`
-      <div class="family">
-        <div class="couple-row">
-          <div class="card blood${bc.unknown?' unknown':''}${bc.deceased?' deceased':''}">
-            ${bc.nickname ? `<span class="nickname">${bc.nickname}</span>` : ''}
-            <span class="fullname">${bc.name}</span>
-            ${bc.deceased ? `<div class="candle-wrap">${candleSVG(16)}<span class="candle-label">At rest</span></div>` : ''}
-            <span class="bio-tag">${bc.bioTag}</span>
-          </div>
+  if(hasBio){
+    const bc=person.bioChild;
+    const bcUid='bc'+Math.random().toString(36).substr(2,9);
+    const bcKids=bc.marriages&&bc.marriages.some(m=>m.children&&m.children.length);
+    mHTML+=`<div class="marriage-unit">
+      <div class="marriage-header">
+        <div class="spouse-connector"></div>
+        <div class="card blood${bc.unknown?' unknown':''}${bc.deceased?' deceased':''}">
+          ${bc.nickname?`<span class="nickname">${bc.nickname}</span>`:''}
+          <span class="fullname">${bc.name}</span>
+          ${bc.deceased?`<div class="candle-wrap">${candleSVG()}<span class="candle-label">At rest</span></div>`:''}
+          <span class="bio-tag">${bc.bioTag}</span>
         </div>
-        ${bc.children && bc.children.length ? (() => {
-          const bcUid = 'n'+Math.random().toString(36).substr(2,9);
-          return `<div class="expand-dot" onclick="toggleFamily('${bcUid}')" title="Expand/collapse">+</div>
-          <div class="children-row hidden" id="${bcUid}">
-            ${bc.children.map(c => renderFamily(c, depth+2)).join('')}
-          </div>`;
-        })() : ''}
-      </div>`);
-  }
-
-  person.children.forEach(child => {
-    allChildren.push(renderFamily(child, depth + 1));
-  });
-
-  const childrenHTML = `
-    <div class="children-row hidden" id="${uid}">
-      ${allChildren.join('')}
+        ${bcKids?`<div class="expand-dot" onclick="toggleFamily('${bcUid}')">+</div>`:''}
+      </div>
+      ${bcKids?`<div class="children-row hidden" id="${bcUid}" style="margin-left:14px">${bc.marriages.flatMap(m=>(m.children||[]).map(c=>renderPerson(c))).join('')}</div>`:''}
     </div>`;
-
-  return `<div class="family">${coupleHTML}${childrenHTML}</div>`;
-}
-
-function buildTree() {
-  const wrap = document.getElementById('treeWrap');
-  wrap.innerHTML = `<div class="level">${renderFamily(TREE, 0)}</div>`;
-  updateConnectors();
-}
-
-function toggleFamily(uid) {
-  const row = document.getElementById(uid);
-  if (!row) return;
-  const isHidden = row.classList.contains('hidden');
-  row.classList.toggle('hidden');
-  // Find the expand dot that triggered this
-  const dot = row.previousElementSibling;
-  if (dot && dot.classList.contains('expand-dot')) {
-    dot.textContent = isHidden ? '−' : '+';
-    dot.classList.toggle('open', isHidden);
   }
-  updateConnectors();
-}
 
-function updateConnectors() {
-  // Draw horizontal connector lines over all visible children-rows
-  document.querySelectorAll('.children-row:not(.hidden)').forEach(row => {
-    const children = Array.from(row.querySelectorAll(':scope > .family'));
-    if (children.length < 2) return;
-    const rowRect = row.getBoundingClientRect();
-    const scrollX = window.scrollX;
-    // Get first and last child couple-row center
-    const getCenter = el => {
-      const r = el.getBoundingClientRect();
-      return r.left + r.width / 2 + scrollX;
-    };
+  marriages.forEach((marriage,idx)=>{
+    const mUid='m'+Math.random().toString(36).substr(2,9);
+    const hasKids=marriage.children&&marriage.children.length>0;
+    const multiLabel=marriages.length>1?`<div class="marriage-label">Partnership ${idx+1}</div>`:'';
+    mHTML+=`<div class="marriage-unit">
+      ${multiLabel}
+      <div class="marriage-header">
+        <div class="spouse-connector"></div>
+        ${marriage.spouse?`<span class="plus">+</span>${makeCard(marriage.spouse,true)}`:''}
+        ${hasKids?`<div class="expand-dot" onclick="toggleFamily('${mUid}')">+</div>`:''}
+      </div>
+      ${hasKids?`<div class="children-row hidden" id="${mUid}" style="margin-left:14px">${marriage.children.map(c=>renderPerson(c)).join('')}</div>`:''}
+    </div>`;
   });
+
+  return `<div class="person-node"><div class="multi-spouse-row"><div class="person-self">${selfCard}</div><div class="marriages-col">${mHTML}</div></div></div>`;
 }
 
-buildTree();
+document.getElementById('treeWrap').innerHTML=`<div class="level">${renderPerson(TREE)}</div>`;
 
-/* ══ MODAL ══ */
-function openMeals(e, name, meals) {
+function toggleFamily(uid){
+  const row=document.getElementById(uid);if(!row)return;
+  const hidden=row.classList.contains('hidden');
+  row.classList.toggle('hidden');
+  const dot=row.previousElementSibling;
+  if(dot&&dot.classList.contains('expand-dot')){dot.textContent=hidden?'−':'+';dot.classList.toggle('open',hidden);}
+}
+
+function openMeals(e,name,meals){
   e.stopPropagation();
-  document.getElementById('modalTitle').textContent = name + "'s Favorite Meals";
-  const list = document.getElementById('modalMeals');
-  list.innerHTML = '';
-  const labels = ['Meal #1','Meal #2','Meal #3'];
-  for (let i = 0; i < 3; i++) {
-    const li = document.createElement('li');
-    const m = (meals && meals[i] && meals[i] !== '?') ? meals[i] : null;
-    li.innerHTML = `
-      <svg width="18" height="22" viewBox="0 0 22 28" style="flex-shrink:0"><use href="#fork-knife"/></svg>
-      <span>${m ? `<strong>${m}</strong>` : `<span class='meal-empty'>${labels[i]} — coming soon! Use the suggestion box to share 🌟</span>`}</span>`;
+  document.getElementById('modalTitle').textContent=name+"'s Favorite Meals";
+  const list=document.getElementById('modalMeals');list.innerHTML='';
+  const count=Math.max(meals.length,3);
+  for(let i=0;i<count;i++){
+    const li=document.createElement('li');
+    const m=meals&&meals[i]&&meals[i]!=='?'?meals[i]:null;
+    li.innerHTML=`<svg width="14" height="18" viewBox="0 0 22 28" style="flex-shrink:0"><use href="#fork-knife"/></svg><span>${m?`<strong>${m}</strong>`:`<span class='meal-empty'>Meal #${i+1} — share via suggestion box 🌟</span>`}</span>`;
     list.appendChild(li);
   }
   document.getElementById('mealModal').classList.add('open');
 }
-function closeMeals() { document.getElementById('mealModal').classList.remove('open'); }
-document.addEventListener('keydown', e => { if (e.key==='Escape') closeMeals(); });
+function closeMeals(){document.getElementById('mealModal').classList.remove('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMeals();});
 
-/* ══ SUGGESTION ══ */
-function submitSuggestion() {
-  const msg = document.getElementById('sugMessage').value.trim();
-  if (!msg) { document.getElementById('sugMessage').focus(); return; }
-  ['sugName','sugType','sugPerson','sugMessage'].forEach(id => document.getElementById(id).value = '');
-  const c = document.getElementById('submitConfirm');
-  c.classList.add('show');
-  setTimeout(() => c.classList.remove('show'), 5000);
+async function submitSuggestion(){
+  const msg=document.getElementById('sugMessage').value.trim();
+  if(!msg){document.getElementById('sugMessage').focus();return;}
+
+  const btn=document.querySelector('.submit-btn');
+  btn.disabled=true;btn.textContent='Sending…';
+
+  const payload={
+    name:document.getElementById('sugName').value.trim(),
+    type:document.getElementById('sugType').value,
+    person:document.getElementById('sugPerson').value.trim(),
+    message:msg
+  };
+
+  try{
+    await fetch('https://script.google.com/macros/s/AKfycbwBveDfsn9kxs37oqzohgHOd17zpbGs54UAobnymwUhkS6X4UggbteD17VqOdO-f21w/exec',{
+      method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+  }catch(err){console.warn('Submission error:',err);}
+
+  ['sugName','sugType','sugPerson','sugMessage'].forEach(id=>document.getElementById(id).value='');
+  btn.disabled=false;
+  btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px"><path d="M2,3 L22,12 L2,21 L2,14 L16,12 L2,10 Z" fill="#5C3D2E"/></svg>Send to the Family Tree';
+  const c=document.getElementById('submitConfirm');c.classList.add('show');setTimeout(()=>c.classList.remove('show'),5000);
 }
 </script>
 </body>
