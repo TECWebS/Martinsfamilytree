@@ -63,7 +63,9 @@
     .card.blood{border-color:var(--gold);background:linear-gradient(135deg,#fffde7,#fff3cd);}
     .card.spouse{border-color:var(--leaf-light);background:linear-gradient(135deg,#f5fbf5,#e8f5e9);}
     .card.root{border-color:var(--gold);background:linear-gradient(135deg,#fffde7,#fff3cd);}
-    .card.deceased{background:#e8e4d9!important;border-color:#b8a878!important;}
+    .card.deceased{background:#eeeae0;border-color:#b8b0a0;}
+    .card.blood.deceased{background:linear-gradient(135deg,#f0e8c8,#e8d89a);border-color:#c8a830;}
+    .card.spouse.deceased{background:linear-gradient(135deg,#ddeedd,#c8e0c8);border-color:#7aaa7a;}
     .card.unknown{border-style:dotted;opacity:.8;}
     .nickname{font-size:.65rem;font-style:italic;color:var(--rose);font-weight:700;line-height:1;margin-bottom:1px;white-space:normal;overflow:visible;}
     .fullname{font-size:.8rem;font-weight:700;color:var(--text);line-height:1.3;white-space:normal;overflow:visible;text-overflow:clip;}
@@ -97,7 +99,9 @@
     .card.blood{border-color:var(--gold);background:linear-gradient(135deg,#fffde7,#fff3cd);}
     .card.spouse{border-color:var(--leaf-light);background:linear-gradient(135deg,#f5fbf5,#e8f5e9);}
     .card.root{border-color:var(--gold);background:linear-gradient(135deg,#fffde7,#fff3cd);box-shadow:0 4px 14px rgba(212,160,23,.25);width:104px;}
-    .card.deceased{background:#e8e4d9!important;border-color:#b8a878!important;}
+    .card.deceased{background:#eeeae0;border-color:#b8b0a0;}
+    .card.blood.deceased{background:linear-gradient(135deg,#f0e8c8,#e8d89a);border-color:#c8a830;}
+    .card.spouse.deceased{background:linear-gradient(135deg,#ddeedd,#c8e0c8);border-color:#7aaa7a;}
     .card.unknown{border-style:dotted;opacity:.8;}
     .card.no-children{cursor:default;}
     .card.no-children:hover{transform:none;box-shadow:0 2px 6px var(--shadow);}
@@ -258,7 +262,7 @@ const TREE = {
     children:[
       // Dennis
       {blood:true,deceased:true,name:'Dennis Martin',
-       marriages:[{spouse:{name:'Ethel Martin',deceased:true},children:[]}]},
+       marriages:[{spouse:{name:'Ethel',deceased:true},children:[]}]},
       // Mae-Mae
       {blood:true,deceased:true,nickname:'Mae-Mae',name:'Mabel Martin',
        marriages:[{
@@ -320,7 +324,7 @@ const TREE = {
                  }
                ]},
                // 3. Jim Higgins
-               {spouse:{name:'James Higgins'},children:[
+               {spouse:{name:'Jim Higgins'},children:[
                  {blood:true,name:'Darlene Duncan',meals:['Kielbasa','Hamburger Helper','Pork Chops'],marriages:[
                    {spouse:{name:'Ellis Duncan'},children:[
                      {blood:true,name:'Nicole Duncan',marriages:[
@@ -365,7 +369,7 @@ const TREE = {
        marriages:[{spouse:{name:'Leo Jackson',deceased:true},children:[{blood:true,name:'Delores'}]}]},
       // Lindsey
       {blood:true,deceased:true,name:'Lindsey Martin',
-       marriages:[{spouse:{name:'Martha Martin',deceased:true},children:[
+       marriages:[{spouse:{name:'Martha',deceased:true},children:[
          {blood:true,name:'Michael Martin',marriages:[{spouse:null,children:[
            {blood:true,name:'Adopted Child 1',adopted:true,adoptedBy:'Michael Martin'},
            {blood:true,name:'Adopted Child 2',adopted:true,adoptedBy:'Michael Martin'}
@@ -374,14 +378,10 @@ const TREE = {
       // Herman
       {
         blood:true,deceased:true,name:'Herman Martin',
-        bioChild:{
-          bioTag:"Herman's biological child · other relationship",
-          blood:true,name:'James ??',
-          marriages:[]
-        },
-        marriages:[{
-          spouse:{name:'Harriet',deceased:true},
-          children:[
+        marriages:[
+          {
+            spouse:{name:'Harriet',deceased:true},
+            children:[
             {blood:true,name:'Vera',marriages:[{spouse:{name:'Don'},children:[
               {blood:true,name:'Donna',marriages:[]},
               {blood:true,name:'Joey',marriages:[]},
@@ -392,15 +392,32 @@ const TREE = {
             ]}]},
             {
               blood:true,name:'Leon',
-              bioChild:{bioTag:"Ann's biological child · family member",blood:true,name:'Jeffery'},
-              marriages:[{spouse:{name:'Ann'},children:[
-                {blood:true,nickname:'Little Leon',name:'Leon II'},
-                {blood:true,name:'Anthony'}
-              ]}]
+              marriages:[
+                {spouse:{name:'Ann'},children:[
+                  {blood:true,nickname:'Little Leon',name:'Leon II'},
+                  {blood:true,name:'Anthony'}
+                ]},
+                {
+                  spouse:null,
+                  children:[
+                    {blood:true,name:'Jeffery',marriages:[]}
+                  ]
+                }
+              ]
             },
             {blood:true,name:'Peewee'}
           ]
-        }]
+        },
+        {
+          spouse:null,
+          children:[
+            {
+              blood:true,name:'James Martin',
+              marriages:[]
+            }
+          ]
+        }
+        ]
       }
     ]
   }]
