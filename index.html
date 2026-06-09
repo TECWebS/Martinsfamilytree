@@ -25,28 +25,32 @@
   .legend-item{background:rgba(255,255,255,.16);border-radius:20px;padding:4px 10px;color:#fff;font-size:.75rem;display:flex;align-items:center;gap:6px;}
 
   /* TREE */
-  .tree-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:30px 12px 60px;}
+  .tree-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:30px 20px 60px;}
   .scroll-hint{text-align:center;font-size:.75rem;color:var(--muted);padding:8px 0 0;font-style:italic;}
   @media(min-width:700px){.scroll-hint{display:none;}}
-  .level{display:flex;justify-content:center;}
 
-  /* PERSON NODE */
-  .person-node{display:flex;flex-direction:column;align-items:flex-start;padding:0 4px;}
-  .multi-spouse-row{display:flex;align-items:flex-start;gap:0;}
-  .person-self{display:flex;flex-direction:column;align-items:center;}
-  .marriages-col{display:flex;flex-direction:column;gap:8px;margin-left:0;}
-  .marriage-unit{display:flex;flex-direction:column;align-items:flex-start;}
-  .marriage-header{display:flex;align-items:center;gap:3px;flex-wrap:nowrap;}
-  .spouse-connector{height:2px;background:var(--connector);width:14px;flex-shrink:0;align-self:center;}
-  .marriage-label{font-size:.58rem;color:var(--muted);font-style:italic;margin-bottom:2px;padding-left:14px;white-space:nowrap;}
-
-  .expand-dot{width:18px;height:18px;border-radius:50%;background:var(--leaf);color:#fff;font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin-left:4px;cursor:pointer;transition:background .2s,transform .2s;flex-shrink:0;line-height:1;}
+  /* TOP-DOWN CONNECTED TREE */
+  .tree-root{display:flex;justify-content:center;}
+  .person-node{display:flex;flex-direction:column;align-items:center;position:relative;padding:0 6px;}
+  .couple-row{display:flex;align-items:center;justify-content:center;gap:0;}
+  .plus{font-size:1rem;color:var(--bark-light);font-weight:700;padding:0 3px;align-self:center;flex-shrink:0;}
+  .v-stem{width:2px;background:var(--connector);margin:0 auto;}
+  .expand-dot{width:20px;height:20px;border-radius:50%;background:var(--leaf);color:#fff;font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto;cursor:pointer;transition:background .2s,transform .2s;flex-shrink:0;position:relative;z-index:2;}
   .expand-dot:hover{background:var(--bark);transform:scale(1.15);}
   .expand-dot.open{background:var(--rose);}
-  .plus{font-size:1rem;color:var(--bark-light);font-weight:700;padding:0 2px;align-self:center;flex-shrink:0;}
-
-  .children-row{display:flex;justify-content:flex-start;align-items:flex-start;flex-wrap:wrap;gap:6px;margin-top:6px;padding:0 4px;}
-  .children-row.hidden{display:none;}
+  .children-section{display:flex;flex-direction:column;align-items:center;}
+  .children-section.hidden{display:none;}
+  .h-bar-wrap{position:relative;width:100%;}
+  .h-bar{height:2px;background:var(--connector);position:absolute;top:0;left:0;right:0;}
+  .children-row{display:flex;justify-content:center;align-items:flex-start;gap:0;position:relative;padding-top:2px;}
+  .child-slot{display:flex;flex-direction:column;align-items:center;padding:0 6px;}
+  .child-drop{width:2px;background:var(--connector);}
+  .marriages-stack{display:flex;flex-direction:column;align-items:center;gap:0;width:100%;}
+  .marriage-block{display:flex;flex-direction:column;align-items:center;width:100%;}
+  .marriage-divider{width:60%;height:1px;border-top:1px dashed var(--connector);margin:4px auto;}
+  .marriage-label{font-size:.58rem;color:var(--muted);font-style:italic;margin:2px 0;text-align:center;white-space:nowrap;}
+  .bio-row{display:flex;align-items:center;gap:6px;margin:6px auto;}
+  .bio-connector{height:2px;border-top:2px dashed var(--rose);width:20px;flex-shrink:0;}
 
   /* CARDS */
   .card{display:inline-flex;flex-direction:column;align-items:center;background:var(--card-bg);border:2px solid var(--bark-light);border-radius:14px;padding:7px 9px;cursor:pointer;box-shadow:0 2px 8px var(--shadow);transition:transform .18s,box-shadow .18s,border-color .18s;width:108px;min-width:76px;max-width:118px;text-align:center;user-select:none;word-break:break-word;overflow-wrap:break-word;white-space:normal;}
@@ -63,8 +67,7 @@
   .fullname{font-size:.77rem;font-weight:700;color:var(--text);line-height:1.3;word-break:break-word;}
   .card.deceased .fullname{color:var(--deceased-text);}
   .card.deceased .nickname{color:#7a8fa6;}
-  .candle-wrap{margin-top:4px;display:flex;align-items:center;justify-content:center;gap:3px;}
-  .candle-label{font-size:.57rem;color:var(--deceased-text);font-style:italic;}
+  .dove{margin-top:4px;font-size:.85rem;line-height:1;}
   .adopted-heart{display:inline-block;cursor:default;position:relative;margin-left:2px;}
   .adopted-heart .tip{display:none;position:absolute;bottom:130%;left:50%;transform:translateX(-50%);background:var(--rose);color:#fff;font-size:.68rem;padding:3px 8px;border-radius:8px;white-space:nowrap;pointer-events:none;z-index:20;}
   .adopted-heart:hover .tip{display:block;}
@@ -107,14 +110,6 @@
 <body>
 <svg width="0" height="0" style="position:absolute;overflow:hidden">
   <defs>
-    <symbol id="candle" viewBox="0 0 20 30">
-      <ellipse cx="10" cy="8" rx="6" ry="6" fill="rgba(255,200,50,0.18)"/>
-      <path d="M10,2 Q13,5 12,9 Q11,12 10,11 Q9,12 8,9 Q7,5 10,2 Z" fill="#F59E0B"/>
-      <path d="M10,4 Q11.5,6.5 11,9 Q10.5,11 10,10.5 Q9.5,11 9,9 Q8.5,6.5 10,4 Z" fill="#FDE68A"/>
-      <line x1="10" y1="11" x2="10" y2="14" stroke="#4A3728" stroke-width="1.2" stroke-linecap="round"/>
-      <rect x="7" y="14" width="6" height="14" rx="2" fill="#FDE68A" stroke="#D4A017" stroke-width="1"/>
-      <rect x="8.5" y="16" width="1.5" height="8" rx="0.7" fill="rgba(255,255,255,0.45)"/>
-    </symbol>
     <symbol id="fork-knife" viewBox="0 0 22 28">
       <line x1="5" y1="2" x2="5" y2="11" stroke="#5C3D2E" stroke-width="2" stroke-linecap="round"/>
       <line x1="9" y1="2" x2="9" y2="11" stroke="#5C3D2E" stroke-width="2" stroke-linecap="round"/>
@@ -149,7 +144,7 @@
   <div class="legend">
     <div class="legend-item"><svg width="13" height="13" viewBox="0 0 13 13"><rect x="1" y="1" width="11" height="11" rx="3" fill="#D4A017"/></svg>Blood — Martin line</div>
     <div class="legend-item"><svg width="13" height="13" viewBox="0 0 13 13"><rect x="1" y="1" width="11" height="11" rx="3" fill="#5AA85F"/></svg>Married in</div>
-    <div class="legend-item"><svg width="14" height="21" viewBox="0 0 20 30"><use href="#candle"/></svg>At rest</div>
+    <div class="legend-item">🕊️ At rest</div>
     <div class="legend-item"><svg width="14" height="18" viewBox="0 0 22 28"><use href="#fork-knife"/></svg>Favorite meals</div>
     <div class="legend-item"><svg width="13" height="12" viewBox="0 0 20 18"><use href="#heart"/></svg>Adopted with love</div>
   </div>
@@ -218,9 +213,9 @@ const TREE = {
     children:[
       // Dennis
       {blood:true,deceased:true,name:'Dennis Martin',
-       marriages:[{spouse:{name:'Ethel',deceased:true},children:[{blood:true,name:'?',unknown:true}]}]},
+       marriages:[{spouse:{name:'Ethel',deceased:true},children:[]}]},
       // Mae-Mae
-      {blood:true,deceased:true,nickname:'Mae-Mae',name:'Martin',
+      {blood:true,deceased:true,nickname:'Mae-Mae',name:'Mable Martin',
        marriages:[{
          spouse:{name:'John Moseby',deceased:true},
          children:[
@@ -237,9 +232,7 @@ const TREE = {
                      {blood:true,nickname:'Little Norman',name:'Norman Collins III'}
                    ]}
                  ]},
-                 {blood:true,name:'Denis Collins',meals:['?','?','?'],marriages:[
-                   {spouse:null,children:[{blood:true,name:'?',unknown:true}]}
-                 ]}
+                 {blood:true,name:'Denis Collins',meals:['?','?','?'],marriages:[]}
                ]},
                // 2. Unknown (??)
                {spouse:{name:'??',unknown:true},children:[
@@ -274,15 +267,15 @@ const TREE = {
                      {spouse:{name:'Malik Jones'},children:[{blood:true,nickname:'Joshua',name:'Yehoshua Yehudah'}]},
                      {spouse:{name:'Robert Ford',nickname:'Kevin Kelly'},children:[
                        {blood:true,name:'Tyrique Edwards',marriages:[
-                         {spouse:{name:'Nafysa Edwards'},children:[{blood:true,name:'?',unknown:true}]}
+                         {spouse:{name:'Nafysa Edwards'},children:[]}
                        ]}
                      ]},
                      {spouse:{name:'Andre Vegas Jr.'},children:[{blood:true,name:'Tyicia Edwards'}]}
                    ]
                  }
                ]},
-               // 3. ?? Higgins
-               {spouse:{name:'?? Higgins',unknown:true},children:[
+               // 3. James Higgins
+               {spouse:{name:'James Higgins'},children:[
                  {blood:true,name:'Darlene Duncan',meals:['?','?','?'],marriages:[
                    {spouse:{name:'Ellis Duncan'},children:[
                      {blood:true,name:'Nicole Duncan',marriages:[
@@ -329,8 +322,8 @@ const TREE = {
       {blood:true,deceased:true,name:'Lindsey Martin',
        marriages:[{spouse:{name:'Martha',deceased:true},children:[
          {blood:true,name:'Michael Martin',marriages:[{spouse:null,children:[
-           {blood:true,name:'Adopted Child 1',adopted:true,adoptedBy:'Michael Martin',unknown:true},
-           {blood:true,name:'Adopted Child 2',adopted:true,adoptedBy:'Michael Martin',unknown:true}
+           {blood:true,name:'Adopted Child 1',adopted:true,adoptedBy:'Michael Martin'},
+           {blood:true,name:'Adopted Child 2',adopted:true,adoptedBy:'Michael Martin'}
          ]}]}
        ]}]},
       // Herman
@@ -339,16 +332,16 @@ const TREE = {
         bioChild:{
           bioTag:"Herman's biological child · other relationship",
           blood:true,name:'James ??',
-          marriages:[{spouse:null,children:[{blood:true,name:'Kids…',unknown:true}]}]
+          marriages:[]
         },
         marriages:[{
           spouse:{name:'Harriet',deceased:true},
           children:[
             {blood:true,name:'Vera',marriages:[{spouse:{name:'Don'},children:[
-              {blood:true,name:'Donna',marriages:[{spouse:{name:'??',unknown:true},children:[{blood:true,name:'?',unknown:true}]}]},
-              {blood:true,name:'Joey',marriages:[{spouse:{name:'??',unknown:true},children:[{blood:true,name:'?',unknown:true}]}]},
+              {blood:true,name:'Donna',marriages:[]},
+              {blood:true,name:'Joey',marriages:[]},
               {blood:true,name:'Cathy',marriages:[{spouse:{name:'Earl Wilson'},children:[
-                {blood:true,nickname:'Little Earl',name:'Earl Wilson II',marriages:[{spouse:{name:'??',unknown:true},children:[{blood:true,name:'Kids',unknown:true}]}]},
+                {blood:true,nickname:'Little Earl',name:'Earl Wilson II',marriages:[]},
                 {blood:true,name:'Tobias Wilson'}
               ]}]}
             ]}]},
@@ -369,7 +362,7 @@ const TREE = {
 };
 
 /* RENDER */
-function candleSVG(s=14){return `<svg width="${s}" height="${s*1.5}" viewBox="0 0 20 30"><use href="#candle"/></svg>`;}
+function doveMark(){return `<div class="dove">🕊️</div>`;}
 function forkSVG(){return `<svg width="14" height="18" viewBox="0 0 22 28"><use href="#fork-knife"/></svg>`;}
 function heartSVG(){return `<svg width="11" height="10" viewBox="0 0 20 18"><use href="#heart"/></svg>`;}
 
@@ -388,7 +381,7 @@ function makeCard(person,isSpouse){
   if(person.adopted)n+=` <span class="adopted-heart">${heartSVG()}<span class="tip">Adopted with love</span></span>`;
   h+=`<span class="fullname">${n}</span>`;
   if(person.adopted&&person.adoptedBy)h+=`<span class="adopted-note">Adopted by ${person.adoptedBy}</span>`;
-  if(person.deceased)h+=`<div class="candle-wrap">${candleSVG()}<span class="candle-label">At rest</span></div>`;
+  if(person.deceased)h+=doveMark();
   if(!isSpouse&&person.meals){
     const mj=JSON.stringify(person.meals).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     h+=`<button class="meal-btn" onclick="openMeals(event,'${(person.name||'').replace(/'/g,"\\'")}',${mj})" title="Favorite meals">${forkSVG()}</button>`;
@@ -396,67 +389,111 @@ function makeCard(person,isSpouse){
   return `<div class="${cls.join(' ')}">${h}</div>`;
 }
 
+/* Render a row of children with a shared horizontal bar above them */
+function renderChildrenSection(children, uid) {
+  if(!children||!children.length) return '';
+  const slots = children.map(c=>`
+    <div class="child-slot">
+      <div class="child-drop" style="height:18px"></div>
+      ${renderPerson(c)}
+    </div>`).join('');
+  return `
+    <div class="children-section hidden" id="${uid}">
+      <div class="h-bar-wrap" style="height:2px"><div class="h-bar"></div></div>
+      <div class="children-row">${slots}</div>
+    </div>`;
+}
+
 function renderPerson(person){
-  const marriages=person.marriages||[];
-  const hasBio=!!person.bioChild;
-  const hasExpandable=hasBio||marriages.some(m=>m.children&&m.children.length>0);
+  const marriages = person.marriages||[];
+  const hasBio = !!person.bioChild;
+  const selfCard = makeCard(person, false);
 
-  const selfCard=makeCard(person,false);
+  // Single marriage (or none): simple top-down layout
+  if(!hasBio && marriages.length<=1){
+    const marriage = marriages[0];
+    const hasKids = marriage&&marriage.children&&marriage.children.length>0;
+    const uid = 'm'+Math.random().toString(36).substr(2,9);
 
-  if(!hasExpandable){
-    if(marriages.length===1&&marriages[0].spouse){
-      return `<div class="person-node"><div class="multi-spouse-row"><div class="person-self">${selfCard}</div><span class="plus">+</span>${makeCard(marriages[0].spouse,true)}</div></div>`;
+    const coupleRow = `<div class="couple-row">
+      ${selfCard}
+      ${marriage&&marriage.spouse?`<span class="plus">+</span>${makeCard(marriage.spouse,true)}`:''}
+    </div>`;
+
+    if(!hasKids){
+      return `<div class="person-node">${coupleRow}</div>`;
     }
-    return `<div class="person-node"><div class="multi-spouse-row"><div class="person-self">${selfCard}</div></div></div>`;
+
+    return `<div class="person-node">
+      ${coupleRow}
+      <div class="v-stem" style="height:8px"></div>
+      <div class="expand-dot" onclick="toggleFamily('${uid}')">+</div>
+      <div class="v-stem" style="height:8px"></div>
+      ${renderChildrenSection(marriage.children, uid)}
+    </div>`;
   }
 
-  let mHTML='';
+  // Multiple marriages OR bioChild: stack marriages vertically, each with its own children
+  let blocksHTML = '';
 
+  // Bio child shown as a side callout above marriages
   if(hasBio){
-    const bc=person.bioChild;
-    const bcUid='bc'+Math.random().toString(36).substr(2,9);
-    const bcKids=bc.marriages&&bc.marriages.some(m=>m.children&&m.children.length);
-    mHTML+=`<div class="marriage-unit">
-      <div class="marriage-header">
-        <div class="spouse-connector"></div>
-        <div class="card blood${bc.unknown?' unknown':''}${bc.deceased?' deceased':''}">
-          ${bc.nickname?`<span class="nickname">${bc.nickname}</span>`:''}
-          <span class="fullname">${bc.name}</span>
-          ${bc.deceased?`<div class="candle-wrap">${candleSVG()}<span class="candle-label">At rest</span></div>`:''}
-          <span class="bio-tag">${bc.bioTag}</span>
+    const bc = person.bioChild;
+    const bcUid = 'bc'+Math.random().toString(36).substr(2,9);
+    const bcKids = bc.marriages&&bc.marriages.some(m=>m.children&&m.children.length);
+    const bcChildren = bcKids ? bc.marriages.flatMap(m=>m.children||[]) : [];
+    blocksHTML += `
+      <div class="bio-row">
+        <div class="bio-connector"></div>
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <div class="card blood${bc.unknown?' unknown':''}${bc.deceased?' deceased':''}">
+            ${bc.nickname?`<span class="nickname">${bc.nickname}</span>`:''}
+            <span class="fullname">${bc.name}</span>
+            ${bc.deceased?doveMark():''}
+            <span class="bio-tag">${bc.bioTag}</span>
+          </div>
+          ${bcKids?`<div class="v-stem" style="height:8px"></div>
+          <div class="expand-dot" onclick="toggleFamily('${bcUid}')">+</div>
+          <div class="v-stem" style="height:8px"></div>
+          ${renderChildrenSection(bcChildren,bcUid)}`:''}
         </div>
-        ${bcKids?`<div class="expand-dot" onclick="toggleFamily('${bcUid}')">+</div>`:''}
-      </div>
-      ${bcKids?`<div class="children-row hidden" id="${bcUid}" style="margin-left:14px">${bc.marriages.flatMap(m=>(m.children||[]).map(c=>renderPerson(c))).join('')}</div>`:''}
-    </div>`;
+      </div>`;
   }
 
   marriages.forEach((marriage,idx)=>{
-    const mUid='m'+Math.random().toString(36).substr(2,9);
-    const hasKids=marriage.children&&marriage.children.length>0;
-    const multiLabel=marriages.length>1?`<div class="marriage-label">Partnership ${idx+1}</div>`:'';
-    mHTML+=`<div class="marriage-unit">
-      ${multiLabel}
-      <div class="marriage-header">
-        <div class="spouse-connector"></div>
-        ${marriage.spouse?`<span class="plus">+</span>${makeCard(marriage.spouse,true)}`:''}
-        ${hasKids?`<div class="expand-dot" onclick="toggleFamily('${mUid}')">+</div>`:''}
-      </div>
-      ${hasKids?`<div class="children-row hidden" id="${mUid}" style="margin-left:14px">${marriage.children.map(c=>renderPerson(c)).join('')}</div>`:''}
-    </div>`;
+    const mUid = 'm'+Math.random().toString(36).substr(2,9);
+    const hasKids = marriage.children&&marriage.children.length>0;
+    const isMulti = marriages.length>1;
+
+    blocksHTML += `
+      <div class="marriage-block">
+        ${isMulti?`<div class="marriage-label">Partnership ${idx+1}</div>`:''}
+        ${isMulti&&idx>0?`<div class="marriage-divider"></div>`:''}
+        <div class="couple-row">
+          ${idx===0?selfCard:'<div style="width:108px;min-width:76px"></div>'}
+          ${marriage.spouse?`<span class="plus">+</span>${makeCard(marriage.spouse,true)}`:''}
+        </div>
+        ${hasKids?`
+          <div class="v-stem" style="height:8px"></div>
+          <div class="expand-dot" onclick="toggleFamily('${mUid}')">+</div>
+          <div class="v-stem" style="height:8px"></div>
+          ${renderChildrenSection(marriage.children,mUid)}`:''}
+      </div>`;
   });
 
-  return `<div class="person-node"><div class="multi-spouse-row"><div class="person-self">${selfCard}</div><div class="marriages-col">${mHTML}</div></div></div>`;
+  return `<div class="person-node"><div class="marriages-stack">${blocksHTML}</div></div>`;
 }
 
-document.getElementById('treeWrap').innerHTML=`<div class="level">${renderPerson(TREE)}</div>`;
+document.getElementById('treeWrap').innerHTML=`<div class="tree-root">${renderPerson(TREE)}</div>`;
 
 function toggleFamily(uid){
-  const row=document.getElementById(uid);if(!row)return;
-  const hidden=row.classList.contains('hidden');
-  row.classList.toggle('hidden');
-  const dot=row.previousElementSibling;
-  if(dot&&dot.classList.contains('expand-dot')){dot.textContent=hidden?'−':'+';dot.classList.toggle('open',hidden);}
+  const section=document.getElementById(uid);if(!section)return;
+  const hidden=section.classList.contains('hidden');
+  section.classList.toggle('hidden');
+  // Find the expand-dot just before this section (walk up siblings)
+  let el=section.previousElementSibling;
+  while(el&&!el.classList.contains('expand-dot'))el=el.previousElementSibling;
+  if(el){el.textContent=hidden?'−':'+';el.classList.toggle('open',hidden);}
 }
 
 function openMeals(e,name,meals){
