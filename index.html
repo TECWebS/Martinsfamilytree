@@ -258,7 +258,7 @@ const TREE = {
     children:[
       // Dennis
       {blood:true,deceased:true,name:'Dennis Martin',
-       marriages:[{spouse:{name:'Ethel',deceased:true},children:[]}]},
+       marriages:[{spouse:{name:'Ethel Martin',deceased:true},children:[]}]},
       // Mae-Mae
       {blood:true,deceased:true,nickname:'Mae-Mae',name:'Mabel Martin',
        marriages:[{
@@ -365,7 +365,7 @@ const TREE = {
        marriages:[{spouse:{name:'Leo Jackson',deceased:true},children:[{blood:true,name:'Delores'}]}]},
       // Lindsey
       {blood:true,deceased:true,name:'Lindsey Martin',
-       marriages:[{spouse:{name:'Martha',deceased:true},children:[
+       marriages:[{spouse:{name:'Martha Martin',deceased:true},children:[
          {blood:true,name:'Michael Martin',marriages:[{spouse:null,children:[
            {blood:true,name:'Adopted Child 1',adopted:true,adoptedBy:'Michael Martin'},
            {blood:true,name:'Adopted Child 2',adopted:true,adoptedBy:'Michael Martin'}
@@ -436,7 +436,9 @@ function makeCard(person,isSpouse){
   if(!isSpouse&&person.meals){
     const safeJson=JSON.stringify(person.meals);
     const safeName=person.name||'';
+    /* MEALS HIDDEN — uncomment to re-enable
     h+=`<button class="meal-btn" data-name="${safeName.replace(/"/g,'&quot;')}" data-meals='${safeJson.replace(/'/g,'&#39;')}' title="Favorite meals">${forkSVG()}</button>`;
+    */
   }
   // Touch toggle for tooltip on mobile
   const touchAttr=`ontouchstart="this.classList.toggle('tip-open');event.stopPropagation()"`;
