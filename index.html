@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Family Tree 🌳</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Nunito:wght@400;600;700&display=swap');
+
+  :root {
+    --bark:       #5C3D2E;
+    --bark-light: #7A5544;
+    --leaf:       #3A7D44;
+    --leaf-light: #5AA85F;
+    --sky:        #EAF4FB;
+    --cream:      #FDF8F1;
+    --gold:       #D4A017;
+    --rose:       #C0616B;
+    --text:       #2E1F0F;
+    --muted:      #8A7060;
+    --card-bg:    #FFFDF8;
+    --shadow:     rgba(92,61,46,0.15);
+    --adopted-color: #C0616B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HERO ─────────────────────────────────────── */
+  .hero {
+    background: linear-gradient(160deg, var(--bark) 0%, var(--bark-light) 60%, var(--leaf) 100%);
+    padding: 48px 24px 56px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-svg {
+    position: absolute; bottom: 0; left: 0; width: 100%; pointer-events: none;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    color: #fff;
+    line-height: 1.15;
+    text-shadow: 0 2px 8px rgba(0,0,0,.3);
+  }
+  .hero p {
+    margin-top: 10px;
+    color: rgba(255,255,255,.85);
+    font-size: 1.05rem;
+    font-style: italic;
+  }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 14px;
+    justify-content: center; margin-top: 20px;
+  }
+  .legend-item {
+    background: rgba(255,255,255,.18);
+    border-radius: 20px;
+    padding: 5px 14px;
+    color: #fff;
+    font-size: .82rem;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  /* ── TREE CONTAINER ───────────────────────────── */
+  .tree-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 36px 16px 60px;
+  }
+
+  /* ── NODE ─────────────────────────────────────── */
+  .node { margin: 4px 0; }
+
+  .node-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 4px 0;
+  }
+
+  .card {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--card-bg);
+    border: 2px solid var(--bark-light);
+    border-radius: 14px;
+    padding: 8px 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px var(--shadow);
+    transition: transform .18s, box-shadow .18s, border-color .18s;
+    position: relative;
+    min-width: 90px;
+    text-align: center;
+    user-select: none;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px var(--shadow);
+    border-color: var(--leaf);
+  }
+  .card.blood {
+    border-color: var(--bark);
+    background: linear-gradient(135deg, #fffdf8 0%, #f6efe2 100%);
+  }
+  .card.spouse {
+    border-color: var(--leaf-light);
+    background: linear-gradient(135deg, #f5fbf5 0%, #e8f5e9 100%);
+  }
+  .card.root {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, #fffde7 0%, #fff3cd 100%);
+    box-shadow: 0 4px 16px rgba(212,160,23,.25);
+  }
+  .card.deceased {
+    opacity: .72;
+    border-style: dashed;
+  }
+  .card.unknown {
+    border-style: dotted;
+    opacity: .8;
+  }
+
+  .nickname {
+    font-size: .72rem;
+    font-style: italic;
+    color: var(--rose);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+  .fullname {
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .deceased-tag {
+    font-size: .65rem;
+    color: var(--muted);
+    margin-top: 2px;
+    font-style: italic;
+  }
+  .adopted-heart {
+    display: inline-block;
+    cursor: default;
+    font-size: .9rem;
+    margin-left: 4px;
+    position: relative;
+  }
+  .adopted-heart .tooltip {
+    display: none;
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--rose);
+    color: #fff;
+    font-size: .7rem;
+    padding: 3px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .adopted-heart:hover .tooltip { display: block; }
+
+  .plus { font-size: 1.1rem; color: var(--bark-light); font-weight: 700; padding: 0 2px; align-self: center; }
+
+  /* Meal icon */
+  .meal-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 1rem; padding: 2px 3px;
+    transition: transform .15s;
+    margin-top: 2px;
+    display: block;
+  }
+  .meal-btn:hover { transform: scale(1.3); }
+
+  /* Expand chevron */
+  .chevron {
+    font-size: .7rem;
+    color: var(--leaf);
+    margin-top: 2px;
+    transition: transform .2s;
+  }
+  .chevron.open { transform: rotate(180deg); }
+
+  /* ── CHILDREN BRANCH ─────────────────────────── */
+  .children {
+    margin-left: 38px;
+    padding-left: 18px;
+    border-left: 3px solid var(--leaf-light);
+    position: relative;
+  }
+  .children::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -3px;
+    width: 3px; height: 18px;
+    background: var(--leaf-light);
+  }
+  .children.hidden { display: none; }
+
+  .branch-label {
+    font-size: .7rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin: 6px 0 2px 0;
+  }
+
+  /* ── SECTION DIVIDER ─────────────────────────── */
+  .section-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 32px 0 16px;
+  }
+  .section-divider span {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; color: var(--bark);
+    white-space: nowrap;
+  }
+  .section-divider::before,
+  .section-divider::after {
+    content: ''; flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--bark-light), transparent);
+  }
+
+  /* ── MEAL MODAL ──────────────────────────────── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(46,31,15,.5);
+    z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 28px 30px;
+    max-width: 360px; width: 92%;
+    box-shadow: 0 12px 40px rgba(0,0,0,.3);
+    position: relative;
+    border: 3px solid var(--gold);
+  }
+  .modal h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem; color: var(--bark);
+    margin-bottom: 6px;
+  }
+  .modal .sub { font-size: .82rem; color: var(--muted); margin-bottom: 16px; font-style: italic; }
+  .meal-list { list-style: none; }
+  .meal-list li {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px dashed #e8dcc8;
+    font-size: .92rem;
+  }
+  .meal-list li:last-child { border-bottom: none; }
+  .meal-list li .meal-icon-svg { flex-shrink: 0; }
+  .meal-empty { color: var(--muted); font-style: italic; font-size: .85rem; }
+  .modal-close {
+    position: absolute; top: 12px; right: 14px;
+    background: none; border: none; font-size: 1.4rem;
+    cursor: pointer; color: var(--muted);
+    line-height: 1;
+  }
+  .modal-close:hover { color: var(--rose); }
+
+  /* ── SUGGESTION BOX ──────────────────────────── */
+  .suggestion-section {
+    background: linear-gradient(135deg, var(--bark) 0%, var(--bark-light) 100%);
+    padding: 40px 24px 48px;
+    margin-top: 20px;
+  }
+  .suggestion-inner {
+    max-width: 680px; margin: 0 auto; text-align: center;
+  }
+  .suggestion-inner h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem; color: #fff;
+    margin-bottom: 8px;
+  }
+  .suggestion-inner p { color: rgba(255,255,255,.8); margin-bottom: 22px; font-size: .95rem; }
+  .suggestion-form {
+    background: rgba(255,255,255,.1);
+    border-radius: 18px;
+    padding: 24px;
+    text-align: left;
+  }
+  .form-row { margin-bottom: 14px; }
+  .form-row label {
+    display: block; color: rgba(255,255,255,.9);
+    font-size: .84rem; font-weight: 700; margin-bottom: 5px;
+  }
+  .form-row input,
+  .form-row select,
+  .form-row textarea {
+    width: 100%;
+    background: rgba(255,255,255,.92);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 10px 13px;
+    font-family: 'Nunito', sans-serif;
+    font-size: .9rem;
+    color: var(--text);
+    transition: border-color .18s;
+  }
+  .form-row input:focus,
+  .form-row select:focus,
+  .form-row textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  .form-row textarea { min-height: 100px; resize: vertical; }
+  .submit-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--gold);
+    color: var(--bark);
+    border: none; border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    cursor: pointer;
+    transition: background .2s, transform .15s;
+    margin-top: 4px;
+  }
+  .submit-btn:hover { background: #e8b824; transform: translateY(-1px); }
+  .submit-confirm {
+    display: none;
+    margin-top: 14px;
+    background: rgba(255,255,255,.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #fff;
+    font-size: .9rem;
+    text-align: center;
+  }
+  .submit-confirm.show { display: block; }
+
+  /* ── FOOTER ──────────────────────────────────── */
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: .78rem;
+    color: var(--muted);
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .children { margin-left: 18px; padding-left: 10px; }
+    .card { min-width: 70px; padding: 6px 10px; }
+    .fullname { font-size: .8rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ HERO ══════════════════════════════════════════════════════ -->
+<div class="hero">
+  <!-- Decorative tree SVG -->
+  <svg class="hero-svg" viewBox="0 0 1200 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,40 Q100,10 200,40 Q300,70 400,40 Q500,10 600,40 Q700,70 800,40 Q900,10 1000,40 Q1100,70 1200,40 L1200,80 L0,80 Z" fill="rgba(255,255,255,0.08)"/>
+    <path d="M0,55 Q150,25 300,55 Q450,85 600,55 Q750,25 900,55 Q1050,85 1200,55 L1200,80 L0,80 Z" fill="rgba(255,255,255,0.07)"/>
+    <!-- little leaves -->
+    <ellipse cx="120" cy="28" rx="18" ry="10" fill="rgba(90,168,95,0.35)" transform="rotate(-20,120,28)"/>
+    <ellipse cx="380" cy="20" rx="14" ry="8" fill="rgba(90,168,95,0.3)" transform="rotate(15,380,20)"/>
+    <ellipse cx="780" cy="18" rx="16" ry="9" fill="rgba(90,168,95,0.3)" transform="rotate(-10,780,18)"/>
+    <ellipse cx="1050" cy="25" rx="13" ry="7" fill="rgba(90,168,95,0.3)" transform="rotate(12,1050,25)"/>
+  </svg>
+
+  <!-- Big tree SVG icon -->
+  <svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:10px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.25))">
+    <ellipse cx="40" cy="32" rx="26" ry="24" fill="#3A7D44"/>
+    <ellipse cx="25" cy="38" rx="16" ry="14" fill="#5AA85F"/>
+    <ellipse cx="55" cy="36" rx="16" ry="14" fill="#5AA85F"/>
+    <ellipse cx="40" cy="20" rx="18" ry="16" fill="#5AA85F"/>
+    <ellipse cx="40" cy="28" rx="22" ry="20" fill="#3A7D44"/>
+    <rect x="36" y="52" width="8" height="22" rx="4" fill="#5C3D2E"/>
+    <ellipse cx="32" cy="58" rx="6" ry="4" fill="#7A5544" transform="rotate(-15,32,58)"/>
+    <ellipse cx="48" cy="60" rx="5" ry="3" fill="#7A5544" transform="rotate(10,48,60)"/>
+  </svg>
+
+  <h1>Our Family Tree</h1>
+  <p>Rooted in love · Growing through generations</p>
+
+  <div class="legend">
+    <div class="legend-item">
+      <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#D4A017"/></svg>
+      Momma &amp; Poppa
+    </div>
+    <div class="legend-item">
+      <svg width="12" height="12" viewBox="0 0 12 12"><rect x="1" y="1" width="10" height="10" rx="3" fill="#7A5544"/></svg>
+      Blood relative
+    </div>
+    <div class="legend-item">
+      <svg width="12" height="12" viewBox="0 0 12 12"><rect x="1" y="1" width="10" height="10" rx="3" fill="#5AA85F"/></svg>
+      Married in
+    </div>
+    <div class="legend-item">🍽️ Favorite meals</div>
+    <div class="legend-item">❤️ Adopted with love</div>
+    <div class="legend-item">– – Deceased</div>
+  </div>
+</div>
+
+<!-- ══ TREE ═══════════════════════════════════════════════════════ -->
+<div class="tree-container">
+
+  <!-- ── ROOT COUPLE ── -->
+  <div class="node">
+    <div class="node-row">
+      <div class="card root blood" onclick="toggleChildren(this)">
+        <span class="fullname">Momma</span>
+        <button class="meal-btn" onclick="openMeals(event,'Momma',[])" title="Favorite meals">🍽️</button>
+        <span class="chevron">▼</span>
+      </div>
+      <span class="plus">+</span>
+      <div class="card root spouse">
+        <span class="fullname">Poppa</span>
+        <button class="meal-btn" onclick="openMeals(event,'Poppa',[])" title="Favorite meals">🍽️</button>
+      </div>
+    </div>
+
+    <div class="children">
+
+      <!-- ════ 1. DENNIS + ETHEL ════ -->
+      <div class="node">
+        <div class="node-row">
+          <div class="card blood" onclick="toggleChildren(this)">
+            <span class="fullname">Dennis</span>
+            <button class="meal-btn" onclick="openMeals(event,'Dennis',[])" title="Favorite meals">🍽️</button>
+            <span class="chevron">▼</span>
+          </div>
+          <span class="plus">+</span>
+          <div class="card spouse">
+            <span class="fullname">Ethel</span>
+            <button class="meal-btn" onclick="openMeals(event,'Ethel',[])" title="Favorite meals">🍽️</button>
+          </div>
+        </div>
+        <div class="children hidden">
+          <p class="branch-label">Children</p>
+          <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">?</span></div></div></div>
+        </div>
+      </div>
+
+      <!-- ════ 2. MAE-MAE + JOHN MOSEBY ════ -->
+      <div class="node">
+        <div class="node-row">
+          <div class="card blood" onclick="toggleChildren(this)">
+            <span class="fullname">Mae-Mae</span>
+            <button class="meal-btn" onclick="openMeals(event,'Mae-Mae',[])" title="Favorite meals">🍽️</button>
+            <span class="chevron">▼</span>
+          </div>
+          <span class="plus">+</span>
+          <div class="card spouse">
+            <span class="fullname">John Moseby</span>
+            <button class="meal-btn" onclick="openMeals(event,'John Moseby',[])" title="Favorite meals">🍽️</button>
+          </div>
+        </div>
+        <div class="children hidden">
+
+          <!-- 2a. Lena Moseby (Dolly) + Norman Collins -->
+          <div class="node">
+            <div class="node-row">
+              <div class="card blood" onclick="toggleChildren(this)">
+                <span class="nickname">Dolly</span>
+                <span class="fullname">Lena Moseby</span>
+                <button class="meal-btn" onclick="openMeals(event,'Lena Moseby (Dolly)',['?','?','?'])" title="Favorite meals">🍽️</button>
+                <span class="chevron">▼</span>
+              </div>
+              <span class="plus">+</span>
+              <div class="card spouse">
+                <span class="fullname">Norman Collins</span>
+                <button class="meal-btn" onclick="openMeals(event,'Norman Collins',[])" title="Favorite meals">🍽️</button>
+              </div>
+            </div>
+            <div class="children hidden">
+              <p class="branch-label">Children</p>
+
+              <!-- Norman Collins II + Doreen -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Norman Collins II</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Norman Collins II',['?','?','?'])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                  <span class="plus">+</span>
+                  <div class="card spouse">
+                    <span class="fullname">Doreen</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Doreen',[])" title="Favorite meals">🍽️</button>
+                  </div>
+                </div>
+                <div class="children hidden">
+                  <p class="branch-label">Children</p>
+                  <div class="node"><div class="node-row"><div class="card blood deceased"><span class="fullname">Warren</span><span class="deceased-tag">✝ Deceased</span></div></div></div>
+                  <div class="node"><div class="node-row"><div class="card blood"><span class="nickname">Little Norman</span><span class="fullname">Norman Collins III</span></div></div></div>
+                </div>
+              </div>
+
+              <!-- Denis Collins -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Denis Collins</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Denis Collins',['?','?','?'])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                </div>
+                <div class="children hidden">
+                  <div class="node"><div class="node-row"><div class="card blood unknown"><span class="fullname">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2b. Lena Moseby + ?? -->
+          <div class="node">
+            <div class="node-row">
+              <div class="card blood" onclick="toggleChildren(this)">
+                <span class="nickname">Dolly</span>
+                <span class="fullname">Lena Moseby</span>
+                <button class="meal-btn" onclick="openMeals(event,'Lena Moseby (Dolly)',['?','?','?'])" title="Favorite meals">🍽️</button>
+                <span class="chevron">▼</span>
+              </div>
+              <span class="plus">+</span>
+              <div class="card spouse unknown">
+                <span class="fullname">??</span>
+              </div>
+            </div>
+            <div class="children hidden">
+              <p class="branch-label">Children</p>
+
+              <!-- Pamela Hunt + Herbert John Wesley -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Pamela Hunt</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Pamela Hunt',['?','?','?'])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                  <span class="plus">+</span>
+                  <div class="card spouse">
+                    <span class="fullname">Herbert John Wesley</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Herbert John Wesley',[])" title="Favorite meals">🍽️</button>
+                  </div>
+                </div>
+                <div class="children hidden">
+                  <p class="branch-label">Children</p>
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood" onclick="toggleChildren(this)">
+                        <span class="fullname">Wesley Jermaine Collins</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Wesley Jermaine Collins',[])" title="Favorite meals">🍽️</button>
+                        <span class="chevron">▼</span>
+                      </div>
+                      <span class="plus">+</span>
+                      <div class="card spouse">
+                        <span class="fullname">Jasmine Collins</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Jasmine Collins',[])" title="Favorite meals">🍽️</button>
+                      </div>
+                    </div>
+                    <div class="children hidden">
+                      <p class="branch-label">Children</p>
+                      <div class="node"><div class="node-row"><div class="card blood"><span class="nickname">Little Wes</span><span class="fullname">Wesley Jermaine Collins II</span></div></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pamela Hunt + Roderick Garnet Hunt -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Pamela Hunt</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Pamela Hunt',['?','?','?'])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                  <span class="plus">+</span>
+                  <div class="card spouse">
+                    <span class="fullname">Roderick Garnet Hunt</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Roderick Garnet Hunt',[])" title="Favorite meals">🍽️</button>
+                  </div>
+                </div>
+                <div class="children hidden">
+                  <p class="branch-label">Children</p>
+
+                  <!-- RJ + Danielle -->
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood" onclick="toggleChildren(this)">
+                        <span class="nickname">RJ</span>
+                        <span class="fullname">Roderick Garnet Hunt II</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Roderick Garnet Hunt II (RJ)',[])" title="Favorite meals">🍽️</button>
+                        <span class="chevron">▼</span>
+                      </div>
+                      <span class="plus">+</span>
+                      <div class="card spouse">
+                        <span class="fullname">Danielle Degrate</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Danielle Degrate',[])" title="Favorite meals">🍽️</button>
+                      </div>
+                    </div>
+                    <div class="children hidden">
+                      <p class="branch-label">Children</p>
+                      <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Raeannah Hunt</span></div></div></div>
+                    </div>
+                  </div>
+
+                  <!-- RJ + Amanda Howard -->
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood" onclick="toggleChildren(this)">
+                        <span class="nickname">RJ</span>
+                        <span class="fullname">Roderick Garnet Hunt II</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Roderick Garnet Hunt II (RJ)',[])" title="Favorite meals">🍽️</button>
+                        <span class="chevron">▼</span>
+                      </div>
+                      <span class="plus">+</span>
+                      <div class="card spouse">
+                        <span class="fullname">Amanda Howard</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Amanda Howard',[])" title="Favorite meals">🍽️</button>
+                      </div>
+                    </div>
+                    <div class="children hidden">
+                      <p class="branch-label">Children</p>
+                      <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Josiyah Garnet Hunt</span></div></div></div>
+                      <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Jaliyah Hunt</span></div></div></div>
+                      <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Janiyah Hunt</span></div></div></div>
+                    </div>
+                  </div>
+
+                  <!-- RJ + Jennifer Hall -->
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood" onclick="toggleChildren(this)">
+                        <span class="nickname">RJ</span>
+                        <span class="fullname">Roderick Garnet Hunt II</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Roderick Garnet Hunt II (RJ)',[])" title="Favorite meals">🍽️</button>
+                        <span class="chevron">▼</span>
+                      </div>
+                      <span class="plus">+</span>
+                      <div class="card spouse">
+                        <span class="fullname">Jennifer Hall</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Jennifer Hall',[])" title="Favorite meals">🍽️</button>
+                      </div>
+                    </div>
+                    <div class="children hidden">
+                      <p class="branch-label">Children</p>
+                      <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Jada Hunt</span></div></div></div>
+                      <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Jahari Hunt</span></div></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pamela Hunt + Charles Edwards (Zeek) -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Pamela Hunt</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Pamela Hunt',['?','?','?'])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                  <span class="plus">+</span>
+                  <div class="card spouse">
+                    <span class="nickname">Zeek</span>
+                    <span class="fullname">Charles Edwards</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Charles Edwards (Zeek)',[])" title="Favorite meals">🍽️</button>
+                  </div>
+                </div>
+                <div class="children hidden">
+                  <p class="branch-label">Children</p>
+                  <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Tashanna Edwards</span></div></div></div>
+                  <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Tiraa Edwards</span></div></div></div>
+                </div>
+              </div>
+
+              <!-- Pamela Hunt + Luis Anderson -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Pamela Hunt</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Pamela Hunt',['?','?','?'])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                  <span class="plus">+</span>
+                  <div class="card spouse">
+                    <span class="fullname">Luis Anderson</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Luis Anderson',[])" title="Favorite meals">🍽️</button>
+                  </div>
+                </div>
+                <div class="children hidden">
+                  <p class="branch-label">Children</p>
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood" onclick="toggleChildren(this)">
+                        <span class="fullname">Tianna Edwards</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Tianna Edwards',[])" title="Favorite meals">🍽️</button>
+                        <span class="chevron">▼</span>
+                      </div>
+                      <span class="plus">+</span>
+                      <div class="card spouse">
+                        <span class="fullname">Besim Collom</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Besim Collom',[])" title="Favorite meals">🍽️</button>
+                      </div>
+                    </div>
+                    <div class="children hidden">
+                      <p class="branch-label">Children</p>
+                      <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Nalla Collom</span></div></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pamela Hunt + Malik Jones -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Pamela Hunt</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Pamela Hunt',['?','?','?'])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                  <span class="plus">+</span>
+                  <div class="card spouse">
+                    <span class="fullname">Malik Jones</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Malik Jones',[])" title="Favorite meals">🍽️</button>
+                  </div>
+                </div>
+                <div class="children hidden">
+                  <p class="branch-label">Children</p>
+                  <div class="node"><div class="node-row"><div class="card blood"><span class="nickname">Joshua</span><span class="fullname">Yehoshua Yehudah</span></div></div></div>
+                </div>
+              </div>
+
+              <!-- Pamela Hunt + Robert Ford (Kevin Kelly) -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Pamela Hunt</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Pamela Hunt',['?','?','?'])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                  <span class="plus">+</span>
+                  <div class="card spouse">
+                    <span class="nickname">Kevin Kelly</span>
+                    <span class="fullname">Robert Ford</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Robert Ford (Kevin Kelly)',[])" title="Favorite meals">🍽️</button>
+                  </div>
+                </div>
+                <div class="children hidden">
+                  <p class="branch-label">Children</p>
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood" onclick="toggleChildren(this)">
+                        <span class="fullname">Tyrique Edwards</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Tyrique Edwards',[])" title="Favorite meals">🍽️</button>
+                        <span class="chevron">▼</span>
+                      </div>
+                      <span class="plus">+</span>
+                      <div class="card spouse">
+                        <span class="fullname">Nafysa Edwards</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Nafysa Edwards',[])" title="Favorite meals">🍽️</button>
+                      </div>
+                    </div>
+                    <div class="children hidden">
+                      <div class="node"><div class="node-row"><div class="card blood unknown"><span class="fullname">?</span></div></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pamela Hunt + Andre Vegas Jr. -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Pamela Hunt</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Pamela Hunt',['?','?','?'])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                  <span class="plus">+</span>
+                  <div class="card spouse">
+                    <span class="fullname">Andre Vegas Jr.</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Andre Vegas Jr.',[])" title="Favorite meals">🍽️</button>
+                  </div>
+                </div>
+                <div class="children hidden">
+                  <p class="branch-label">Children</p>
+                  <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Tyicia Edwards</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2c. Lena Moseby (Dolly) + ?? Higgins -->
+          <div class="node">
+            <div class="node-row">
+              <div class="card blood" onclick="toggleChildren(this)">
+                <span class="nickname">Dolly</span>
+                <span class="fullname">Lena Moseby</span>
+                <button class="meal-btn" onclick="openMeals(event,'Lena Moseby (Dolly)',['?','?','?'])" title="Favorite meals">🍽️</button>
+                <span class="chevron">▼</span>
+              </div>
+              <span class="plus">+</span>
+              <div class="card spouse unknown">
+                <span class="fullname">?? Higgins</span>
+              </div>
+            </div>
+            <div class="children hidden">
+              <p class="branch-label">Children</p>
+
+              <!-- Darlene Duncan + Ellis Duncan -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Darlene Duncan</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Darlene Duncan',['?','?','?'])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                  <span class="plus">+</span>
+                  <div class="card spouse">
+                    <span class="fullname">Ellis Duncan</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Ellis Duncan',[])" title="Favorite meals">🍽️</button>
+                  </div>
+                </div>
+                <div class="children hidden">
+                  <p class="branch-label">Children</p>
+
+                  <!-- Nicole Duncan + Nate Butler -->
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood" onclick="toggleChildren(this)">
+                        <span class="fullname">Nicole Duncan</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Nicole Duncan',[])" title="Favorite meals">🍽️</button>
+                        <span class="chevron">▼</span>
+                      </div>
+                      <span class="plus">+</span>
+                      <div class="card spouse">
+                        <span class="fullname">Nate Butler</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Nate Butler',[])" title="Favorite meals">🍽️</button>
+                      </div>
+                    </div>
+                    <div class="children hidden">
+                      <p class="branch-label">Children</p>
+                      <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Nehalani Butler</span></div></div></div>
+                    </div>
+                  </div>
+
+                  <!-- Nicole Duncan + Omari Benson -->
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood" onclick="toggleChildren(this)">
+                        <span class="fullname">Nicole Duncan</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Nicole Duncan',[])" title="Favorite meals">🍽️</button>
+                        <span class="chevron">▼</span>
+                      </div>
+                      <span class="plus">+</span>
+                      <div class="card spouse">
+                        <span class="fullname">Omari Benson</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Omari Benson',[])" title="Favorite meals">🍽️</button>
+                      </div>
+                    </div>
+                    <div class="children hidden">
+                      <p class="branch-label">Children</p>
+                      <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Mistah Benson</span></div></div></div>
+                    </div>
+                  </div>
+
+                  <!-- Michelle Duncan + Jah... -->
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood" onclick="toggleChildren(this)">
+                        <span class="fullname">Michelle Duncan</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Michelle Duncan',[])" title="Favorite meals">🍽️</button>
+                        <span class="chevron">▼</span>
+                      </div>
+                      <span class="plus">+</span>
+                      <div class="card spouse unknown">
+                        <span class="fullname">Jah…</span>
+                      </div>
+                    </div>
+                    <div class="children hidden">
+                      <p class="branch-label">Children</p>
+                      <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Love M.</span></div></div></div>
+                    </div>
+                  </div>
+
+                  <!-- Michelle Duncan + Chester -->
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood" onclick="toggleChildren(this)">
+                        <span class="fullname">Michelle Duncan</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Michelle Duncan',[])" title="Favorite meals">🍽️</button>
+                        <span class="chevron">▼</span>
+                      </div>
+                      <span class="plus">+</span>
+                      <div class="card spouse">
+                        <span class="fullname">Chester</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Chester',[])" title="Favorite meals">🍽️</button>
+                      </div>
+                    </div>
+                    <div class="children hidden">
+                      <p class="branch-label">Children</p>
+                      <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Grey Duncan</span></div></div></div>
+                    </div>
+                  </div>
+
+                  <!-- Sherell Duncan + Marcy Baretto -->
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood" onclick="toggleChildren(this)">
+                        <span class="fullname">Sherell Duncan</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Sherell Duncan',[])" title="Favorite meals">🍽️</button>
+                        <span class="chevron">▼</span>
+                      </div>
+                      <span class="plus">+</span>
+                      <div class="card spouse">
+                        <span class="fullname">Marcy Baretto</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Marcy Baretto',[])" title="Favorite meals">🍽️</button>
+                      </div>
+                    </div>
+                    <div class="children hidden">
+                      <p class="branch-label">Children</p>
+                      <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Amayah Baretto</span></div></div></div>
+                    </div>
+                  </div>
+
+                  <!-- Sherell Duncan + ?? -->
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood" onclick="toggleChildren(this)">
+                        <span class="fullname">Sherell Duncan</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Sherell Duncan',[])" title="Favorite meals">🍽️</button>
+                        <span class="chevron">▼</span>
+                      </div>
+                      <span class="plus">+</span>
+                      <div class="card spouse unknown">
+                        <span class="fullname">??</span>
+                      </div>
+                    </div>
+                    <div class="children hidden">
+                      <p class="branch-label">Children</p>
+                      <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Zacari</span></div></div></div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2d. Lena Moseby (Dolly) + Lemuel Pearsall -->
+          <div class="node">
+            <div class="node-row">
+              <div class="card blood" onclick="toggleChildren(this)">
+                <span class="nickname">Dolly</span>
+                <span class="fullname">Lena Moseby</span>
+                <button class="meal-btn" onclick="openMeals(event,'Lena Moseby (Dolly)',['?','?','?'])" title="Favorite meals">🍽️</button>
+                <span class="chevron">▼</span>
+              </div>
+              <span class="plus">+</span>
+              <div class="card spouse">
+                <span class="fullname">Lemuel Pearsall</span>
+                <button class="meal-btn" onclick="openMeals(event,'Lemuel Pearsall',[])" title="Favorite meals">🍽️</button>
+              </div>
+            </div>
+            <div class="children hidden">
+              <p class="branch-label">Children</p>
+
+              <!-- Michael Collins + Eloise Collins (Debby) -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Michael Collins</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Michael Collins',['?','?','?'])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                  <span class="plus">+</span>
+                  <div class="card spouse">
+                    <span class="nickname">Debby</span>
+                    <span class="fullname">Eloise Collins</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Eloise Collins (Debby)',[])" title="Favorite meals">🍽️</button>
+                  </div>
+                </div>
+                <div class="children hidden">
+                  <p class="branch-label">Children</p>
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood">
+                        <span class="fullname">Antwon <span class="adopted-heart">❤️<span class="tooltip">Adopted with love</span></span></span>
+                      </div>
+                    </div>
+                    <div class="branch-label" style="margin-left:8px;font-size:.68rem;color:var(--rose)">Eloise's child · adopted by Michael</div>
+                  </div>
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood">
+                        <span class="fullname">Ricardo <span class="adopted-heart">❤️<span class="tooltip">Adopted with love</span></span></span>
+                      </div>
+                    </div>
+                    <div class="branch-label" style="margin-left:8px;font-size:.68rem;color:var(--rose)">Eloise's child · adopted by Michael</div>
+                  </div>
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood">
+                        <span class="fullname">Lakita <span class="adopted-heart">❤️<span class="tooltip">Adopted with love</span></span></span>
+                      </div>
+                    </div>
+                    <div class="branch-label" style="margin-left:8px;font-size:.68rem;color:var(--rose)">Eloise's child · adopted by Michael</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2e. Lena Moseby (Dolly) + William Ruff -->
+          <div class="node">
+            <div class="node-row">
+              <div class="card blood" onclick="toggleChildren(this)">
+                <span class="nickname">Dolly</span>
+                <span class="fullname">Lena Moseby</span>
+                <button class="meal-btn" onclick="openMeals(event,'Lena Moseby (Dolly)',['?','?','?'])" title="Favorite meals">🍽️</button>
+                <span class="chevron">▼</span>
+              </div>
+              <span class="plus">+</span>
+              <div class="card spouse">
+                <span class="fullname">William Ruff</span>
+                <button class="meal-btn" onclick="openMeals(event,'William Ruff',[])" title="Favorite meals">🍽️</button>
+              </div>
+            </div>
+            <div class="children hidden">
+              <p class="branch-label">Children</p>
+
+              <!-- Sherell Hunter + Bryan Hunter -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Sherell Hunter</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Sherell Hunter',['?','?','?'])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                  <span class="plus">+</span>
+                  <div class="card spouse">
+                    <span class="fullname">Bryan Hunter</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Bryan Hunter',[])" title="Favorite meals">🍽️</button>
+                  </div>
+                </div>
+                <div class="children hidden">
+                  <p class="branch-label">Children</p>
+                  <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Imanni Hunter</span></div></div></div>
+                  <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Imarra Hunter</span></div></div></div>
+                  <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Imannuel Hunter</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end Mae-Mae children -->
+      </div>
+
+      <!-- ════ 3. ARTELIA MARTIN (TIA) + LEO JACKSON ════ -->
+      <div class="node">
+        <div class="node-row">
+          <div class="card blood" onclick="toggleChildren(this)">
+            <span class="nickname">Tia</span>
+            <span class="fullname">Artelia Martin</span>
+            <button class="meal-btn" onclick="openMeals(event,'Artelia Martin (Tia)',[])" title="Favorite meals">🍽️</button>
+            <span class="chevron">▼</span>
+          </div>
+          <span class="plus">+</span>
+          <div class="card spouse">
+            <span class="fullname">Leo Jackson</span>
+            <button class="meal-btn" onclick="openMeals(event,'Leo Jackson',[])" title="Favorite meals">🍽️</button>
+          </div>
+        </div>
+        <div class="children hidden">
+          <p class="branch-label">Children</p>
+          <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Delores</span></div></div></div>
+        </div>
+      </div>
+
+      <!-- ════ 4. LINDSEY + MARTHA ════ -->
+      <div class="node">
+        <div class="node-row">
+          <div class="card blood" onclick="toggleChildren(this)">
+            <span class="fullname">Lindsey</span>
+            <button class="meal-btn" onclick="openMeals(event,'Lindsey',[])" title="Favorite meals">🍽️</button>
+            <span class="chevron">▼</span>
+          </div>
+          <span class="plus">+</span>
+          <div class="card spouse">
+            <span class="fullname">Martha</span>
+            <button class="meal-btn" onclick="openMeals(event,'Martha',[])" title="Favorite meals">🍽️</button>
+          </div>
+        </div>
+        <div class="children hidden">
+          <p class="branch-label">Children</p>
+          <div class="node">
+            <div class="node-row">
+              <div class="card blood" onclick="toggleChildren(this)">
+                <span class="fullname">Michael Martin</span>
+                <button class="meal-btn" onclick="openMeals(event,'Michael Martin',[])" title="Favorite meals">🍽️</button>
+                <span class="chevron">▼</span>
+              </div>
+            </div>
+            <div class="children hidden">
+              <p class="branch-label">Children</p>
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood">
+                    <span class="fullname">Adopted Child 1 <span class="adopted-heart">❤️<span class="tooltip">Adopted with love</span></span></span>
+                    <span class="deceased-tag">Name unknown</span>
+                  </div>
+                </div>
+              </div>
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood">
+                    <span class="fullname">Adopted Child 2 <span class="adopted-heart">❤️<span class="tooltip">Adopted with love</span></span></span>
+                    <span class="deceased-tag">Name unknown</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ 5. HERMAN + HARRIET ════ -->
+      <div class="node">
+        <div class="node-row">
+          <div class="card blood" onclick="toggleChildren(this)">
+            <span class="fullname">Herman</span>
+            <button class="meal-btn" onclick="openMeals(event,'Herman',[])" title="Favorite meals">🍽️</button>
+            <span class="chevron">▼</span>
+          </div>
+          <span class="plus">+</span>
+          <div class="card spouse">
+            <span class="fullname">Harriet</span>
+            <button class="meal-btn" onclick="openMeals(event,'Harriet',[])" title="Favorite meals">🍽️</button>
+          </div>
+        </div>
+        <div class="children hidden">
+
+          <!-- James – Herman's biological son only -->
+          <div style="margin:8px 0 4px 0;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8" fill="none" stroke="#C0616B" stroke-width="2" stroke-dasharray="4 2"/></svg>
+              <span style="font-size:.72rem;font-style:italic;color:var(--rose);font-weight:700;">Herman's biological child (other relationship)</span>
+            </div>
+            <div class="node">
+              <div class="node-row">
+                <div class="card blood" onclick="toggleChildren(this)">
+                  <span class="fullname">James ??</span>
+                  <button class="meal-btn" onclick="openMeals(event,'James',[])" title="Favorite meals">🍽️</button>
+                  <span class="chevron">▼</span>
+                </div>
+              </div>
+              <div class="children hidden">
+                <p class="branch-label">Children</p>
+                <div class="node"><div class="node-row"><div class="card blood unknown"><span class="fullname">Kids…</span></div></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="branch-label">Herman &amp; Harriet's Children</div>
+
+          <!-- Vera + Don -->
+          <div class="node">
+            <div class="node-row">
+              <div class="card blood" onclick="toggleChildren(this)">
+                <span class="fullname">Vera</span>
+                <button class="meal-btn" onclick="openMeals(event,'Vera',[])" title="Favorite meals">🍽️</button>
+                <span class="chevron">▼</span>
+              </div>
+              <span class="plus">+</span>
+              <div class="card spouse">
+                <span class="fullname">Don</span>
+                <button class="meal-btn" onclick="openMeals(event,'Don',[])" title="Favorite meals">🍽️</button>
+              </div>
+            </div>
+            <div class="children hidden">
+              <p class="branch-label">Children</p>
+
+              <!-- Donna + ?? -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Donna</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Donna',[])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                  <span class="plus">+</span>
+                  <div class="card spouse unknown"><span class="fullname">??</span></div>
+                </div>
+                <div class="children hidden">
+                  <div class="node"><div class="node-row"><div class="card blood unknown"><span class="fullname">?</span></div></div></div>
+                </div>
+              </div>
+
+              <!-- Joey + ?? -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Joey</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Joey',[])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                  <span class="plus">+</span>
+                  <div class="card spouse unknown"><span class="fullname">??</span></div>
+                </div>
+                <div class="children hidden">
+                  <div class="node"><div class="node-row"><div class="card blood unknown"><span class="fullname">?</span></div></div></div>
+                </div>
+              </div>
+
+              <!-- Cathy + Earl Wilson -->
+              <div class="node">
+                <div class="node-row">
+                  <div class="card blood" onclick="toggleChildren(this)">
+                    <span class="fullname">Cathy</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Cathy',[])" title="Favorite meals">🍽️</button>
+                    <span class="chevron">▼</span>
+                  </div>
+                  <span class="plus">+</span>
+                  <div class="card spouse">
+                    <span class="fullname">Earl Wilson</span>
+                    <button class="meal-btn" onclick="openMeals(event,'Earl Wilson',[])" title="Favorite meals">🍽️</button>
+                  </div>
+                </div>
+                <div class="children hidden">
+                  <p class="branch-label">Children</p>
+
+                  <!-- Earl Wilson II + ?? -->
+                  <div class="node">
+                    <div class="node-row">
+                      <div class="card blood" onclick="toggleChildren(this)">
+                        <span class="nickname">Little Earl</span>
+                        <span class="fullname">Earl Wilson II</span>
+                        <button class="meal-btn" onclick="openMeals(event,'Earl Wilson II (Little Earl)',[])" title="Favorite meals">🍽️</button>
+                        <span class="chevron">▼</span>
+                      </div>
+                      <span class="plus">+</span>
+                      <div class="card spouse unknown"><span class="fullname">??</span></div>
+                    </div>
+                    <div class="children hidden">
+                      <p class="branch-label">Children</p>
+                      <div class="node"><div class="node-row"><div class="card blood unknown"><span class="fullname">Kids</span></div></div></div>
+                    </div>
+                  </div>
+
+                  <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Tobias Wilson</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leon + Ann -->
+          <div class="node">
+            <div class="node-row">
+              <div class="card blood" onclick="toggleChildren(this)">
+                <span class="fullname">Leon</span>
+                <button class="meal-btn" onclick="openMeals(event,'Leon',[])" title="Favorite meals">🍽️</button>
+                <span class="chevron">▼</span>
+              </div>
+              <span class="plus">+</span>
+              <div class="card spouse">
+                <span class="fullname">Ann</span>
+                <button class="meal-btn" onclick="openMeals(event,'Ann',[])" title="Favorite meals">🍽️</button>
+              </div>
+            </div>
+            <div class="children hidden">
+              <p class="branch-label">Children</p>
+              <div class="node"><div class="node-row"><div class="card blood"><span class="nickname">Little Leon</span><span class="fullname">Leon II</span></div></div></div>
+              <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Anthony</span></div></div></div>
+
+              <!-- Jeffery – Ann's bio son only -->
+              <div style="margin:6px 0 2px 0;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                  <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="8" fill="none" stroke="#C0616B" stroke-width="2" stroke-dasharray="4 2"/></svg>
+                  <span style="font-size:.72rem;font-style:italic;color:var(--rose);font-weight:700;">Ann's biological child · family member</span>
+                </div>
+                <div class="node"><div class="node-row"><div class="card blood"><span class="fullname">Jeffery</span></div></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Peewee -->
+          <div class="node">
+            <div class="node-row">
+              <div class="card blood">
+                <span class="fullname">Peewee</span>
+                <button class="meal-btn" onclick="openMeals(event,'Peewee',[])" title="Favorite meals">🍽️</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- end Herman + Harriet -->
+
+    </div><!-- end root children -->
+  </div><!-- end root node -->
+
+</div><!-- end tree-container -->
+
+<!-- ══ SUGGESTION BOX ════════════════════════════════════════════ -->
+<div class="suggestion-section">
+  <div class="suggestion-inner">
+    <!-- Envelope SVG -->
+    <svg width="52" height="40" viewBox="0 0 52 40" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:10px">
+      <rect x="2" y="2" width="48" height="36" rx="5" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+      <polyline points="2,2 26,22 50,2" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
+      <line x1="2" y1="38" x2="18" y2="22" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+      <line x1="50" y1="38" x2="34" y2="22" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+    </svg>
+
+    <h2>Help Us Fill in the Blanks!</h2>
+    <p>Have a missing name, a family story, a memory, or a correction? Drop it here — every piece helps us grow this tree together. 🌱</p>
+
+    <div class="suggestion-form">
+      <div class="form-row">
+        <label>Your Name (optional)</label>
+        <input type="text" id="sugName" placeholder="e.g. Cousin Tasha">
+      </div>
+      <div class="form-row">
+        <label>Type of Update</label>
+        <select id="sugType">
+          <option value="">— Select one —</option>
+          <option value="missing_name">Missing name / unknown person</option>
+          <option value="missing_meals">Add favorite meals for someone</option>
+          <option value="new_member">New family member to add</option>
+          <option value="correction">Correction to existing info</option>
+          <option value="story">Family story or memory</option>
+          <option value="question">Question for the family</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Who is this about? (if applicable)</label>
+        <input type="text" id="sugPerson" placeholder="e.g. Lena Moseby, or the ?? Higgins branch">
+      </div>
+      <div class="form-row">
+        <label>Your Message</label>
+        <textarea id="sugMessage" placeholder="Share what you know! Every story matters…"></textarea>
+      </div>
+      <button class="submit-btn" onclick="submitSuggestion()">
+        📬 Send to the Family Tree
+      </button>
+      <div class="submit-confirm" id="submitConfirm">
+        🌳 Thank you! Your message has been noted and will help complete our family history.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══════════════════════════════════════════════════════ -->
+<footer>
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px">
+    <ellipse cx="12" cy="9" rx="7" ry="6" fill="#3A7D44"/>
+    <ellipse cx="7" cy="11" rx="4" ry="3.5" fill="#5AA85F"/>
+    <ellipse cx="17" cy="10" rx="4" ry="3.5" fill="#5AA85F"/>
+    <rect x="10.5" y="15" width="3" height="7" rx="1.5" fill="#5C3D2E"/>
+  </svg>
+  Our Family Tree · Made with love · Help us grow it 🌱
+</footer>
+
+<!-- ══ MEAL MODAL ═══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="mealModal" onclick="closeMealsOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeMeals()">✕</button>
+    <h2 id="modalTitle"></h2>
+    <div class="sub">Favorite meals made for the family 🍳</div>
+    <ul class="meal-list" id="modalMeals"></ul>
+  </div>
+</div>
+
+<!-- ══ SCRIPTS ══════════════════════════════════════════════════════ -->
+<script>
+  // ── Expand / collapse ──────────────────────────────────────────
+  function toggleChildren(card) {
+    const node = card.closest('.node');
+    const children = node.querySelector(':scope > .children');
+    if (!children) return;
+    const chevron = card.querySelector('.chevron');
+    children.classList.toggle('hidden');
+    if (chevron) chevron.classList.toggle('open');
+  }
+
+  // ── Meal modal ─────────────────────────────────────────────────
+  function openMeals(e, name, meals) {
+    e.stopPropagation();
+    document.getElementById('modalTitle').textContent = name + "'s Favorite Meals";
+    const list = document.getElementById('modalMeals');
+    list.innerHTML = '';
+    const labels = ['Meal #1', 'Meal #2', 'Meal #3'];
+    for (let i = 0; i < 3; i++) {
+      const li = document.createElement('li');
+      const mealName = (meals && meals[i] && meals[i] !== '?') ? meals[i] : null;
+      li.innerHTML = `
+        <svg class="meal-icon-svg" width="22" height="22" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+          <line x1="5" y1="3" x2="5" y2="10" stroke="#5C3D2E" stroke-width="2" stroke-linecap="round"/>
+          <line x1="8" y1="3" x2="8" y2="10" stroke="#5C3D2E" stroke-width="2" stroke-linecap="round"/>
+          <path d="M5,10 Q6.5,14 6.5,19" stroke="#5C3D2E" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M13,3 Q18,3 18,8 Q18,11 13,11 L13,19" stroke="#5C3D2E" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <span>${mealName
+          ? `<strong>${mealName}</strong>`
+          : `<span class='meal-empty'>${labels[i]} — coming soon! 🌟</span>`
+        }</span>`;
+      list.appendChild(li);
+    }
+    document.getElementById('mealModal').classList.add('open');
+  }
+
+  function closeMeals() {
+    document.getElementById('mealModal').classList.remove('open');
+  }
+  function closeMealsOutside(e) {
+    if (e.target === document.getElementById('mealModal')) closeMeals();
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMeals(); });
+
+  // ── Suggestion box ─────────────────────────────────────────────
+  function submitSuggestion() {
+    const msg = document.getElementById('sugMessage').value.trim();
+    if (!msg) {
+      document.getElementById('sugMessage').focus();
+      return;
+    }
+    // In a real deployment this would POST to a backend.
+    // For now, show confirmation and clear form.
+    document.getElementById('sugName').value = '';
+    document.getElementById('sugType').value = '';
+    document.getElementById('sugPerson').value = '';
+    document.getElementById('sugMessage').value = '';
+    const confirm = document.getElementById('submitConfirm');
+    confirm.classList.add('show');
+    setTimeout(() => confirm.classList.remove('show'), 5000);
+  }
+</script>
+</body>
+</html>
