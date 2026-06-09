@@ -65,11 +65,15 @@
     .child-drop{display:none;}
     .marriages-stack{display:block;}
     .marriage-block{display:block;padding:4px 0;}
-    /* Multi-partner mobile: just stack vertically */
+    /* Multi-partner mobile: stack person then partners vertically */
     .multi-partner-layout{display:block;}
-    .partner-spine{display:none;}
-    .partner-list{display:block;margin-left:12px;border-left:2px solid var(--connector);padding-left:10px;}
+    .multi-partner-person{display:block;margin-bottom:4px;}
+    .partner-h-line{display:none;}
+    .partner-spine-wrap{display:block;margin-left:12px;border-left:2px solid var(--connector);padding-left:10px;}
+    .partner-spine{display:block;border-left:none;margin-left:0;padding-left:0;}
     .partner-stop{display:block;padding:4px 0;}
+    .partner-tick{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .partner-tick-line{display:none;}
     .partner-stop-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
     .partner-children{display:block;margin-left:12px;border-left:2px solid var(--connector);padding-left:10px;}
     .partner-children.hidden{display:none!important;}
@@ -164,9 +168,16 @@
     .card:hover .name-tip{display:block;}
   }
 
-  /* SHARED */
-  .card.deceased .fullname{color:var(--deceased-text);}
-  .card.deceased .nickname{color:#7a8fa6;}
+  /* MATRIARCH — special highlight */
+  @keyframes matriarch-glow{0%,100%{box-shadow:0 0 10px 3px rgba(192,97,107,.4),0 2px 6px var(--shadow);}50%{box-shadow:0 0 22px 8px rgba(192,97,107,.25),0 2px 6px var(--shadow);}}
+  .card.matriarch{
+    border-color:var(--rose)!important;
+    background:linear-gradient(135deg,#fff0f0,#ffe4e8)!important;
+    animation:matriarch-glow 3s ease-in-out infinite;
+  }
+  .card.matriarch .fullname{color:var(--rose)!important;font-weight:700;}
+  .matriarch-crown{font-size:.9rem;line-height:1;margin-bottom:2px;}
+  .matriarch-label{font-size:.58rem;color:var(--rose);font-weight:700;font-style:italic;margin-top:2px;text-align:center;white-space:nowrap;}
   .meal-btn{background:none;border:none;cursor:pointer;transition:transform .15s;display:flex;align-items:center;justify-content:center;}
   .meal-btn:hover{transform:scale(1.3);}
   .adopted-heart{display:inline-block;cursor:default;position:relative;margin-left:2px;vertical-align:middle;}
@@ -243,6 +254,7 @@
     <div class="legend-item">🕊️ At rest</div>
     <div class="legend-item"><svg width="14" height="18" viewBox="0 0 22 28"><use href="#fork-knife"/></svg>Favorite meals</div>
     <div class="legend-item"><svg width="13" height="12" viewBox="0 0 20 18"><use href="#heart"/></svg>Adopted with love</div>
+    <div class="legend-item">👑 Living Matriarch</div>
   </div>
 </div>
 
@@ -349,7 +361,7 @@ const TREE = {
                            {blood:true,name:'Josiyah Garnet Hunt'},{blood:true,name:'Jaliyah Hunt'},{blood:true,name:'Janiyah Hunt'}
                          ]},
                          {spouse:{name:'Jennifer Hall'},children:[
-                           {blood:true,name:'Jadah Hunt'},{blood:true,name:'Jahari Hunt'}
+                           {blood:true,name:'Jada Hunt'},{blood:true,name:'Jahari Hunt'}
                          ]}
                        ]}
                      ]},
@@ -402,7 +414,7 @@ const TREE = {
                ]},
                // 5. William Ruff
                {spouse:{name:'William Ruff',deceased:true},children:[
-                 {blood:true,name:'Cheryll Hunter', nickname:'Missy', meals:['?','?','?'],marriages:[
+                 {blood:true,name:'Cheryll Hunter',nickname:'Missy',meals:['?','?','?'],marriages:[
                    {spouse:{name:'Bryan Hunter'},children:[
                      {blood:true,name:'Imanni Hunter'},{blood:true,name:'Imarra Hunter'},{blood:true,name:'Imannuel Hunter'}
                    ]}
@@ -414,7 +426,7 @@ const TREE = {
        }]},
       // Tia
       {blood:true,deceased:true,nickname:'Tia',name:'Artelia Martin',
-       marriages:[{spouse:{name:'Leo Jackson',deceased:true},children:[{blood:true,name:'Delores'}]}]},
+       marriages:[{spouse:{name:'Leo Jackson',deceased:true},children:[{blood:true,name:'Delores',matriarch:true}]}]},
       // Lindsey
       {blood:true,deceased:true,name:'Lindsey Martin',
        marriages:[{spouse:{name:'Martha',deceased:true},children:[
@@ -459,7 +471,7 @@ const TREE = {
             spouse:{name:'Sarah Huckabee'},
             children:[
               {
-                blood:true,name:'James Huckabee',
+                blood:true,name:'James Martin',
                 marriages:[]
               }
             ]
@@ -480,6 +492,7 @@ function heartSVG(){return `<svg width="11" height="10" viewBox="0 0 20 18"><use
 function makeCard(person,isSpouse){
   const cls=['card'];
   if(person.root)cls.push('root');
+  if(person.matriarch)cls.push('matriarch');
   if(person.blood&&!isSpouse)cls.push('blood');
   if(isSpouse)cls.push('spouse');
   if(person.deceased)cls.push('deceased');
@@ -493,11 +506,13 @@ function makeCard(person,isSpouse){
   const tipText=fullLabel+adoptedLabel;
 
   let h=`<div class="name-tip">${tipText}</div>`;
+  if(person.matriarch)h+=`<div class="matriarch-crown">👑</div>`;
   if(person.nickname)h+=`<span class="nickname">${person.nickname}</span>`;
   let n=person.name;
   if(person.adopted)n+=` ${heartSVG()}`;
   h+=`<span class="fullname">${n}</span>`;
   if(person.adopted&&person.adoptedBy)h+=`<span class="adopted-note">by ${person.adoptedBy}</span>`;
+  if(person.matriarch)h+=`<div class="matriarch-label">Living Matriarch</div>`;
   if(person.deceased)h+=doveMark();
   /* MEALS HIDDEN — uncomment to re-enable when ready
   if(!isSpouse&&person.meals){
