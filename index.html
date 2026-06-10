@@ -656,7 +656,7 @@ function renderPerson(person){
   const marriages = person.marriages||[];
   const hasBio = !!person.bioChild;
 
-  // Multi-partner: use branch layout (desktop) or stacked (mobile via CSS)
+  // Multi-partner: always use branch layout
   if(!hasBio && marriages.length > 1){
     return renderMultiPartner(person);
   }
@@ -676,6 +676,39 @@ function renderPerson(person){
 
     if(!hasKids) return `<div class="person-node">${coupleRow}</div>`;
 
+    // Multiple children: use vertical branch layout (same as multi-partner)
+    if(marriage.children.length > 1){
+      const childStops = marriage.children.map(child => {
+        const cUid = 'cb'+Math.random().toString(36).substr(2,9);
+        const childNode = renderPerson(child);
+        const hasGrandkids = child.marriages&&child.marriages.some(m=>m.children&&m.children.length>0);
+        return `
+          <div class="partner-stop">
+            <div class="partner-tick">
+              <div class="partner-tick-line"></div>
+              <div class="partner-stop-row">
+                ${childNode}
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+
+      return `<div class="person-node">
+        <div class="multi-partner-layout">
+          <div class="multi-partner-person">
+            ${coupleRow}
+          </div>
+          <div class="partner-h-line"></div>
+          <div class="partner-spine-wrap">
+            <div class="partner-spine">
+              ${childStops}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    // Single child: keep simple vertical drop
     return `<div class="person-node">
       ${coupleRow}
       <div class="v-stem" style="height:6px"></div>
