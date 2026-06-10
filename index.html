@@ -241,6 +241,13 @@
   .card.matriarch .fullname{color:var(--rose)!important;font-weight:700;}
   .matriarch-crown{font-size:.9rem;line-height:1;margin-bottom:2px;}
   .matriarch-label{font-size:.58rem;color:var(--rose);font-weight:700;font-style:italic;margin-top:2px;text-align:center;white-space:nowrap;}
+
+  /* PATRIARCH */
+  @keyframes patriarch-glow{0%,100%{box-shadow:0 0 10px 3px rgba(58,125,68,.4),0 2px 6px var(--shadow);}50%{box-shadow:0 0 22px 8px rgba(58,125,68,.25),0 2px 6px var(--shadow);}}
+  .card.patriarch{border-color:var(--leaf)!important;background:linear-gradient(135deg,#f0fff4,#d4edda)!important;animation:patriarch-glow 3s ease-in-out infinite;}
+  .card.patriarch .fullname{color:var(--leaf)!important;font-weight:700;}
+  .patriarch-crown{font-size:.9rem;line-height:1;margin-bottom:2px;}
+  .patriarch-label{font-size:.58rem;color:var(--leaf);font-weight:700;font-style:italic;margin-top:2px;text-align:center;white-space:nowrap;}
   .meal-btn{background:none;border:none;cursor:pointer;transition:transform .15s;display:flex;align-items:center;justify-content:center;}
   .meal-btn:hover{transform:scale(1.3);}
   .adopted-heart{display:inline-block;cursor:default;position:relative;margin-left:2px;vertical-align:middle;}
@@ -318,6 +325,7 @@
     <div class="legend-item"><svg width="14" height="18" viewBox="0 0 22 28"><use href="#fork-knife"/></svg>Favorite meals</div>
     <div class="legend-item"><svg width="13" height="12" viewBox="0 0 20 18"><use href="#heart"/></svg>Adopted with love</div>
     <div class="legend-item">👑 Living Matriarch</div>
+    <div class="legend-item">👑 Living Patriarch</div>
   </div>
 </div>
 
@@ -422,13 +430,13 @@ const TREE = {
                  {blood:true,name:'Dennis Collins',meals:['?','?','?'],marriages:[]}
                ]},
                // 2. Unknown (??)
-               {spouse:{name:'??',unknown:true},children:[
+               {spouse:{name:'Unnamed Ancestor',unknown:true},children:[
                  {
                    blood:true,name:'Pamela Hunt',
                    meals:['Tacos','Spaghetti','Fried Fish'],
                    marriages:[
                      {spouse:{name:'Herbert John Wesley',deceased:true},children:[
-                       {blood:true,name:'Wesley Jermaine Collins',marriages:[
+                       {blood:true,nickname:'Big Wes',name:'Wesley Jermaine Collins',marriages:[
                          {spouse:{name:'Jasmine Collins'},children:[{blood:true,nickname:'Little Wes',name:'Wesley Jermaine Collins II'}]}
                        ]}
                      ]},
@@ -439,7 +447,7 @@ const TREE = {
                            {blood:true,name:'Josiyah Garnet Hunt'},{blood:true,name:'Jaliyah Hunt'},{blood:true,name:'Janiyah Hunt'}
                          ]},
                          {spouse:{name:'Jennifer Hall'},children:[
-                           {blood:true,name:'Jada Hunt'},{blood:true,name:'Jahari Hunt'}
+                           {blood:true,name:'Jadah Hunt'},{blood:true,name:'Jahari Hunt'}
                          ]}
                        ]}
                      ]},
@@ -451,7 +459,7 @@ const TREE = {
                          {spouse:{name:'Besim Collom'},children:[{blood:true,name:'Nalla Collom'}]}
                        ]}
                      ]},
-                     {spouse:{name:'Malik Jones'},children:[{blood:true,nickname:'Joshua',name:'Yehoshua Yehudah'}]},
+                     {spouse:{nickname:'Yehoshua',name:'Malik Jones'},children:[{blood:true,nickname:'Joshua',name:'Yehoshua Yehudah'}]},
                      {spouse:{name:'Robert Ford',nickname:'Kevin Kelly'},children:[
                        {blood:true,name:'Tyrique Edwards',marriages:[
                          {spouse:{name:'Nafysa Edwards'},children:[]}
@@ -466,12 +474,12 @@ const TREE = {
                  {blood:true,name:'Darlene Duncan',meals:['Kielbasa','Hamburger Helper','Pork Chops'],marriages:[
                    {spouse:{name:'Ellis Duncan'},children:[
                      {blood:true,name:'Nicole Duncan',marriages:[
-                       {spouse:{name:'Nate Butler'},children:[{blood:true,name:"Nei'Halani Butler"}]},
+                       {spouse:{name:'Nate Butler'},children:[{blood:true,nickname:'Nani',name:"Nei'Halani Butler"}]},
                        {spouse:{name:'Omarii Benson'},children:[{blood:true,name:'Mistah Benson'}]}
                      ]},
                      {blood:true,name:'Michelle Duncan',marriages:[
-                       {spouse:{name:'Jah…',unknown:true},children:[{blood:true,name:'Love MacIntosh'}]},
-                       {spouse:{name:'Chester'},children:[{blood:true,name:'Grey Duncan'}]}
+                       {spouse:{nickname:'Jah',name:'Jemmel McIntosh'},children:[{blood:true,name:'Love MacIntosh'}]},
+                       {spouse:{nickname:'Chester',name:'Louis Nieves-Rosado'},children:[{blood:true,name:'Grey Nieves-Duncan'}]}
                      ]},
                      {blood:true,name:'Sherell Duncan',marriages:[
                        {spouse:{name:'Marcelino Baretto'},children:[{blood:true,name:'Amayah Baretto'}]},
@@ -492,7 +500,7 @@ const TREE = {
                ]},
                // 5. William Ruff
                {spouse:{name:'William Ruff',deceased:true},children:[
-                 {blood:true,name:'Cheryll Hunter',nickname:'Missy',meals:['Spaghetti','Chicken Rice Gravy with Broccoli','Fettuccine'],marriages:[
+                 {blood:true,nickname:'Missy',name:'Cheryll Hunter',nickname:'Missy',meals:['Spaghetti','Chicken, rice with gravy, and broccoli','Fettuccine'],marriages:[
                    {spouse:{name:'Bryan Hunter'},children:[
                      {blood:true,name:'Imanni Hunter'},{blood:true,name:'Imarra Hunter'},{blood:true,name:'Imannuel Hunter'}
                    ]}
@@ -508,7 +516,7 @@ const TREE = {
       // Lindsey
       {blood:true,deceased:true,name:'Lindsey Martin',
        marriages:[{spouse:{name:'Martha',deceased:true},children:[
-         {blood:true,name:'Michael Martin',marriages:[{spouse:null,children:[
+         {blood:true,name:'Michael Martin',patriarch:true,marriages:[{spouse:null,children:[
            {blood:true,name:'Adopted Child 1',adopted:true,adoptedBy:'Michael Martin'},
            {blood:true,name:'Adopted Child 2',adopted:true,adoptedBy:'Michael Martin'}
          ]}]}
@@ -571,6 +579,7 @@ function makeCard(person,isSpouse){
   const cls=['card'];
   if(person.root)cls.push('root');
   if(person.matriarch)cls.push('matriarch');
+  if(person.patriarch)cls.push('patriarch');
   if(person.blood)cls.push('blood');
   else if(isSpouse)cls.push('spouse');
   if(person.deceased)cls.push('deceased');
@@ -585,12 +594,14 @@ function makeCard(person,isSpouse){
 
   let h=`<div class="name-tip">${tipText}</div>`;
   if(person.matriarch)h+=`<div class="matriarch-crown">👑</div>`;
+  if(person.patriarch)h+=`<div class="patriarch-crown">👑</div>`;
   if(person.nickname)h+=`<span class="nickname">${person.nickname}</span>`;
   let n=person.name;
   if(person.adopted)n+=` ${heartSVG()}`;
   h+=`<span class="fullname">${n}</span>`;
   if(person.adopted&&person.adoptedBy)h+=`<span class="adopted-note">by ${person.adoptedBy}</span>`;
   if(person.matriarch)h+=`<div class="matriarch-label">Living Matriarch</div>`;
+  if(person.patriarch)h+=`<div class="patriarch-label">Living Patriarch</div>`;
   if(person.deceased)h+=doveMark();
   /* MEALS HIDDEN — uncomment to re-enable when ready
   if(!isSpouse&&person.meals){
