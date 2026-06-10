@@ -538,6 +538,15 @@ const TREE = {
         blood:true,deceased:true,name:'Herman Martin',
         marriages:[
           {
+            spouse:{name:'Sarah Huckabee'},
+            children:[
+              {
+                blood:true,name:'James Martin',
+                marriages:[]
+              }
+            ]
+          },
+          {
             spouse:{name:'Harriet',deceased:true},
             children:[
             {blood:true,name:'Vera',marriages:[{spouse:{name:'Don'},children:[
@@ -564,15 +573,6 @@ const TREE = {
               ]
             }
           ]
-          },
-          {
-            spouse:{name:'Sarah Huckabee'},
-            children:[
-              {
-                blood:true,name:'James Martin',
-                marriages:[]
-              }
-            ]
           }
         ]
       },
