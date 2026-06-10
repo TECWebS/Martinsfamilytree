@@ -1010,8 +1010,8 @@ function openProfile(e, name, cardEl){
         snack:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>`,
         hobby:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" stroke-linejoin="round"/></svg>`
       }[item.icon]||'';
-      const previewAttr = item.preview ? `data-preview="${item.preview}" onmouseenter="playSongPreview(this)" onmouseleave="stopSongPreview()"` : '';
-      const hoverHint = item.preview ? `<div style="font-size:.55rem;color:var(--leaf);margin-top:3px;font-style:italic;">Hover to preview</div>` : '';
+      const previewAttr = item.icon === 'music' && item.value ? `data-song="${item.value.replace(/"/g,'&quot;')}" onmouseenter="playSongPreview(this)" onmouseleave="stopSongPreview()"` : '';
+      const hoverHint = item.icon === 'music' && item.value ? `<div style="font-size:.55rem;color:var(--leaf);margin-top:3px;font-style:italic;">Hover to preview</div>` : '';
       favHTML += `<div class="fav-item" ${previewAttr}><div class="fav-label">${iconSVG} ${item.label}</div><div class="fav-value">${item.value}</div>${hoverHint}</div>`;
     }
   });
@@ -1036,18 +1036,48 @@ function closeProfile(){
   document.getElementById('panel-0').innerHTML = `<div class="profile-photo-wrap"><img id="profilePhotoFull" src="" alt="" style="width:100%;display:block;object-fit:cover;max-height:340px;border-radius:12px;"></div>`;
 }
 
-// Song preview on hover
+// Song preview — auto-fetches from iTunes API using song title
 let _previewAudio = null;
-function playSongPreview(el){
-  const url = el.getAttribute('data-preview');
-  if(!url) return;
+let _previewCache = {};
+
+async function playSongPreview(el){
+  const song = el.getAttribute('data-song');
+  if(!song) return;
   stopSongPreview();
+
+  // Show loading state
+  el.style.opacity = '0.7';
+
+  try{
+    // Check cache first
+    if(_previewCache[song]){
+      _playAudio(el, _previewCache[song]);
+      return;
+    }
+    // Fetch from iTunes Search API (no key needed, CORS-friendly)
+    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(song)}&media=music&limit=1&entity=song`);
+    const json = await res.json();
+    const previewUrl = json.results && json.results[0] && json.results[0].previewUrl;
+    if(previewUrl){
+      _previewCache[song] = previewUrl;
+      _playAudio(el, previewUrl);
+    } else {
+      el.style.opacity = '1';
+    }
+  } catch(err){
+    el.style.opacity = '1';
+  }
+}
+
+function _playAudio(el, url){
   _previewAudio = new Audio(url);
   _previewAudio.volume = 0.5;
   _previewAudio.play().catch(()=>{});
+  el.style.opacity = '1';
 }
+
 function stopSongPreview(){
-  if(_previewAudio){ _previewAudio.pause(); _previewAudio = null; }
+  if(_previewAudio){ _previewAudio.pause(); _previewAudio.currentTime = 0; _previewAudio = null; }
 }
 
 
