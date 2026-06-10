@@ -377,7 +377,7 @@
 const TREE = {
   blood:true,deceased:true,root:true,nickname:'Momma',name:'Maggie Woods',
   marriages:[{
-    spouse:{name:'German Martin',nickname:'Poppa',deceased:true},
+    spouse:{name:'German Martin',nickname:'Poppa',deceased:true,blood:true},
     children:[
       // Dennis
       {blood:true,deceased:true,name:'Dennis Martin',
@@ -452,8 +452,8 @@ const TREE = {
                        {spouse:{name:'Omarii Benson'},children:[{blood:true,name:'Mistah Benson'}]}
                      ]},
                      {blood:true,name:'Michelle Duncan',marriages:[
-                       {spouse:{name:'Jemmel McIntosh',unknown:true},children:[{blood:true,name:'Love MacIntosh'}]},
-                       {spouse:{name:'Louis Nieves-Rosado'},children:[{blood:true,name:'Grey Nieves-Duncan'}]}
+                       {spouse:{name:'Jah…',unknown:true},children:[{blood:true,name:'Love MacIntosh'}]},
+                       {spouse:{name:'Chester'},children:[{blood:true,name:'Grey Duncan'}]}
                      ]},
                      {blood:true,name:'Sherell Duncan',marriages:[
                        {spouse:{name:'Marcelino Baretto'},children:[{blood:true,name:'Amayah Baretto'}]},
@@ -553,8 +553,8 @@ function makeCard(person,isSpouse){
   const cls=['card'];
   if(person.root)cls.push('root');
   if(person.matriarch)cls.push('matriarch');
-  if(person.blood&&!isSpouse)cls.push('blood');
-  if(isSpouse)cls.push('spouse');
+  if(person.blood)cls.push('blood');
+  else if(isSpouse)cls.push('spouse');
   if(person.deceased)cls.push('deceased');
   if(person.unknown)cls.push('unknown');
   const hasKids=!isSpouse&&((person.marriages&&person.marriages.some(m=>m.children&&m.children.length))||person.bioChild);
