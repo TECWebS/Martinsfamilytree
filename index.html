@@ -168,7 +168,19 @@
     .card:hover .name-tip{display:block;}
   }
 
-  /* TECWEB FLOATING BADGE */
+  /* ROOT COUPLE — centered, clickable to reveal branch */
+  .root-wrap{display:flex;flex-direction:column;align-items:center;width:100%;}
+  .root-couple{display:flex;align-items:center;justify-content:center;gap:0;cursor:pointer;transition:transform .3s ease;}
+  .root-couple.open{transform:none;}
+  .root-branch-wrap{overflow:hidden;transition:max-height .4s ease,opacity .3s ease;max-height:0;opacity:0;}
+  .root-branch-wrap.hidden{display:none;}
+  .root-branch-wrap.open{max-height:4000px;opacity:1;display:block;}
+  .root-layout{display:flex;align-items:flex-start;}
+  .root-couple-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+  .root-hint{font-size:.65rem;color:var(--muted);font-style:italic;margin-top:4px;text-align:center;transition:opacity .2s;}
+  .card.root:hover ~ .root-hint, .card.root:focus ~ .root-hint{opacity:0;}
+
+
   .tecweb-badge{
     position:fixed;bottom:20px;right:20px;z-index:200;
     background:linear-gradient(135deg,var(--bark),var(--bark-light));
@@ -764,7 +776,82 @@ function renderPerson(person){
   return `<div class="person-node"><div class="marriages-stack">${blocksHTML}</div></div>`;
 }
 
-document.getElementById('treeWrap').innerHTML=`<div class="tree-root">${renderPerson(TREE)}</div>`;
+// ── SPECIAL ROOT RENDER ──
+// Maggie & German centered; clicking either card reveals vertical branch
+function renderRoot(tree) {
+  const rootMarriage = tree.marriages[0];
+  const children = rootMarriage.children || [];
+  const branchId = 'root-branch';
+
+  const maggCard = makeCard(tree, false);
+  const germCard = makeCard(rootMarriage.spouse, true);
+
+  // Build the vertical child branch (same spine style as multi-partner)
+  const childStops = children.map(child => {
+    return `
+      <div class="partner-stop">
+        <div class="partner-tick">
+          <div class="partner-tick-line"></div>
+          <div class="partner-stop-row">
+            ${renderPerson(child)}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="root-wrap">
+      <!-- Centered couple — both cards trigger toggle -->
+      <div class="root-couple" id="root-couple" onclick="toggleRoot()" title="Click to expand family">
+        ${maggCard}
+        <span class="plus">+</span>
+        ${germCard}
+      </div>
+      <div class="root-hint" id="root-hint">Click to explore the family ↓</div>
+
+      <!-- Collapsible branch -->
+      <div class="root-branch-wrap hidden" id="${branchId}">
+        <div class="root-layout">
+          <!-- Couple repeated on left when open -->
+          <div class="root-couple-left">
+            <div style="display:flex;align-items:center;gap:0;">
+              ${maggCard}
+              <span class="plus">+</span>
+              ${germCard}
+            </div>
+          </div>
+          <div class="partner-h-line"></div>
+          <div class="partner-spine-wrap">
+            <div class="partner-spine">
+              ${childStops}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+document.getElementById('treeWrap').innerHTML=`<div class="tree-root">${renderRoot(TREE)}</div>`;
+
+function toggleRoot(){
+  const branch = document.getElementById('root-branch');
+  const couple = document.getElementById('root-couple');
+  const hint   = document.getElementById('root-hint');
+  const isOpen = branch.classList.contains('open');
+
+  if(isOpen){
+    branch.classList.remove('open');
+    branch.classList.add('hidden');
+    couple.style.display = 'flex';
+    hint.style.display = 'block';
+  } else {
+    branch.classList.remove('hidden');
+    branch.classList.add('open');
+    couple.style.display = 'none';
+    hint.style.display = 'none';
+  }
+}
+
 
 function toggleFamily(uid){
   const section=document.getElementById(uid);if(!section)return;
