@@ -168,18 +168,19 @@
     .card:hover .name-tip{display:block;}
   }
 
-  /* ROOT COUPLE — centered, clickable to reveal branch */
+  /* ROOT COUPLE — single layout, CSS handles open/closed state */
   .root-wrap{display:flex;flex-direction:column;align-items:center;width:100%;}
-  .root-couple{display:flex;align-items:center;justify-content:center;gap:0;cursor:pointer;transition:transform .3s ease;}
-  .root-couple.open{transform:none;}
-  .root-branch-wrap{overflow:hidden;transition:max-height .4s ease,opacity .3s ease;max-height:0;opacity:0;}
-  .root-branch-wrap.hidden{display:none;}
-  .root-branch-wrap.open{max-height:4000px;opacity:1;display:block;}
-  .root-layout{display:flex;align-items:flex-start;}
-  .root-couple-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;cursor:pointer;}
-  .root-couple-left:hover > div{opacity:.85;}
-  .root-hint{font-size:.65rem;color:var(--muted);font-style:italic;margin-top:4px;text-align:center;transition:opacity .2s;}
-  .card.root:hover ~ .root-hint, .card.root:focus ~ .root-hint{opacity:0;}
+  .root-toggle-btn{
+    background:none;border:2px dashed var(--muted);border-radius:20px;
+    padding:5px 18px;font-family:'Nunito',sans-serif;font-size:.75rem;
+    color:var(--muted);cursor:pointer;margin-top:8px;transition:all .2s;
+  }
+  .root-toggle-btn:hover{border-color:var(--leaf);color:var(--leaf);}
+  .root-layout{display:flex;align-items:flex-start;justify-content:center;width:100%;}
+  .root-layout.is-open{justify-content:flex-start;}
+  .root-couple-cards{display:flex;align-items:center;flex-shrink:0;}
+  .root-branch-hidden{display:none;}
+  .root-branch-visible{display:flex;align-items:flex-start;}
 
 
   .tecweb-badge{
@@ -786,75 +787,52 @@ function renderRoot(tree) {
   const germCard = makeCard(rootMarriage.spouse, true);
 
   const childStops = children.map(child => `
-      <div class="partner-stop">
-        <div class="partner-tick">
-          <div class="partner-tick-line"></div>
-          <div class="partner-stop-row">${renderPerson(child)}</div>
-        </div>
-      </div>`).join('');
+    <div class="partner-stop">
+      <div class="partner-tick">
+        <div class="partner-tick-line"></div>
+        <div class="partner-stop-row">${renderPerson(child)}</div>
+      </div>
+    </div>`).join('');
 
   return `
     <div class="root-wrap">
-      <!-- Centered couple (collapsed state) -->
-      <div class="root-couple" id="root-couple" title="Click to explore the family">
-        ${maggCard}
-        <span class="plus">+</span>
-        ${germCard}
-      </div>
-      <div class="root-hint" id="root-hint">Click to explore the family ↓</div>
-
-      <!-- Expanded branch (open state) -->
-      <div class="root-branch-wrap hidden" id="root-branch">
-        <div class="root-layout">
-          <div class="root-couple-left" id="root-couple-open" title="Click to collapse">
-            <div style="display:flex;align-items:center;gap:0;">
-              ${maggCard}
-              <span class="plus">+</span>
-              ${germCard}
-            </div>
-          </div>
+      <div class="root-layout" id="root-layout">
+        <div class="root-couple-cards">
+          ${maggCard}
+          <span class="plus">+</span>
+          ${germCard}
+        </div>
+        <div id="root-branch" class="root-branch-hidden">
           <div class="partner-h-line"></div>
           <div class="partner-spine-wrap">
             <div class="partner-spine">${childStops}</div>
           </div>
         </div>
       </div>
+      <button class="root-toggle-btn" id="root-toggle-btn" onclick="toggleRoot()">
+        Explore the family ↓
+      </button>
     </div>`;
 }
 
 document.getElementById('treeWrap').innerHTML=`<div class="tree-root">${renderRoot(TREE)}</div>`;
 
-// Attach click handlers after DOM is built
-// Use stopPropagation on inner cards so clicks don't bubble and double-fire
-document.getElementById('root-couple').addEventListener('click', function(e){
-  // Only toggle if clicking the couple row itself or the + sign, not a card's internal button
-  if(e.target.closest('.meal-btn')) return;
-  toggleRoot();
-});
-document.getElementById('root-couple-open').addEventListener('click', function(e){
-  if(e.target.closest('.meal-btn')) return;
-  toggleRoot();
-});
-
-let _rootToggling = false;
 function toggleRoot(){
-  if(_rootToggling) return;
-  _rootToggling = true;
-  setTimeout(()=>{ _rootToggling = false; }, 300);
-
-  const branch  = document.getElementById('root-branch');
-  const couple  = document.getElementById('root-couple');
-  const hint    = document.getElementById('root-hint');
-  const isOpen  = !branch.classList.contains('hidden');
+  const branch = document.getElementById('root-branch');
+  const btn    = document.getElementById('root-toggle-btn');
+  const layout = document.getElementById('root-layout');
+  const isOpen = branch.classList.contains('root-branch-visible');
 
   if(isOpen){
-    branch.classList.add('hidden');
-    couple.style.display = '';
-    hint.style.display   = '';
+    branch.classList.remove('root-branch-visible');
+    branch.classList.add('root-branch-hidden');
+    layout.classList.remove('is-open');
+    btn.textContent = 'Explore the family ↓';
   } else {
-    branch.classList.remove('hidden');
-    couple.style.display = 'none';
-    hint.style.display   = 'none';
+    branch.classList.remove('root-branch-hidden');
+    branch.classList.add('root-branch-visible');
+    layout.classList.add('is-open');
+    btn.textContent = 'Collapse ↑';
   }
 }
 
