@@ -825,22 +825,33 @@ function renderRoot(tree) {
 document.getElementById('treeWrap').innerHTML=`<div class="tree-root">${renderRoot(TREE)}</div>`;
 
 // Attach click handlers after DOM is built
-document.getElementById('root-couple').addEventListener('click', toggleRoot);
-document.getElementById('root-couple-open').addEventListener('click', toggleRoot);
+// Use stopPropagation on inner cards so clicks don't bubble and double-fire
+document.getElementById('root-couple').addEventListener('click', function(e){
+  // Only toggle if clicking the couple row itself or the + sign, not a card's internal button
+  if(e.target.closest('.meal-btn')) return;
+  toggleRoot();
+});
+document.getElementById('root-couple-open').addEventListener('click', function(e){
+  if(e.target.closest('.meal-btn')) return;
+  toggleRoot();
+});
 
+let _rootToggling = false;
 function toggleRoot(){
+  if(_rootToggling) return;
+  _rootToggling = true;
+  setTimeout(()=>{ _rootToggling = false; }, 300);
+
   const branch  = document.getElementById('root-branch');
   const couple  = document.getElementById('root-couple');
   const hint    = document.getElementById('root-hint');
   const isOpen  = !branch.classList.contains('hidden');
 
   if(isOpen){
-    // Collapse: show centered couple, hide branch
     branch.classList.add('hidden');
     couple.style.display = '';
     hint.style.display   = '';
   } else {
-    // Expand: hide centered couple, show branch
     branch.classList.remove('hidden');
     couple.style.display = 'none';
     hint.style.display   = 'none';
