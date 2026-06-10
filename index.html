@@ -116,30 +116,34 @@
     .bio-row{display:flex;align-items:center;gap:6px;margin:6px auto;}
     .bio-connector{height:2px;border-top:2px dashed var(--rose);width:20px;flex-shrink:0;}
 
-    /* ── MULTI-PARTNER BRANCH LAYOUT ──
-       [Person card] ── horizontal line ──┬── [Partner 1] [+]
-                                          ├── [Partner 2] [+]
-                                          └── [Partner 3] [+]
-       Children expand below each partner
-    */
+    /* ── UNIFIED SPINE LAYOUT ── */
+    .node{display:inline-flex;flex-direction:column;align-items:flex-start;}
+    .branch-layout{display:flex;align-items:flex-start;}
+    .branch-self{flex-shrink:0;}
+    .branch-hline{width:24px;height:2px;background:var(--connector);flex-shrink:0;margin-top:30px;}
+    .branch-spine{border-left:2px solid var(--connector);display:flex;flex-direction:column;}
+    .branch-spine-inner{border-left:2px solid var(--connector);display:flex;flex-direction:column;margin-left:20px;}
+    .spine-stop{display:flex;flex-direction:column;align-items:flex-start;}
+    .spine-tick{display:flex;align-items:center;}
+    .spine-tick-line{width:20px;height:2px;background:var(--connector);flex-shrink:0;}
+    .spine-row{display:flex;align-items:center;gap:6px;padding:6px 0;}
+    .spine-section{display:flex;flex-direction:column;}
+    .spine-section.hidden{display:none;}
+    /* Legacy classes kept for compat */
     .multi-partner-layout{display:flex;align-items:flex-start;}
-    .multi-partner-person{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
-    /* The horizontal connector from person to the vertical spine */
-    .partner-h-line{height:2px;background:var(--connector);width:28px;flex-shrink:0;align-self:flex-start;margin-top:28px;/* vertically center with card */}
-    /* Vertical spine that all partners attach to */
-    .partner-spine-wrap{display:flex;flex-direction:column;align-items:flex-start;}
-    .partner-spine{position:relative;display:flex;flex-direction:column;gap:0;}
-    /* Each partner stop on the spine */
-    .partner-stop{display:flex;flex-direction:column;align-items:flex-start;position:relative;}
-    /* The tick line from spine to partner card */
-    .partner-tick{display:flex;align-items:center;gap:0;padding:6px 0;}
+    .multi-partner-person{flex-shrink:0;}
+    .partner-h-line{width:24px;height:2px;background:var(--connector);flex-shrink:0;margin-top:30px;}
+    .partner-spine-wrap{display:flex;flex-direction:column;}
+    .partner-spine{border-left:2px solid var(--connector);display:flex;flex-direction:column;margin-left:1px;}
+    .partner-stop{display:flex;flex-direction:column;}
+    .partner-tick{display:flex;align-items:center;}
     .partner-tick-line{width:20px;height:2px;background:var(--connector);flex-shrink:0;}
-    .partner-stop-row{display:flex;align-items:center;gap:6px;}
-    /* Children section under a partner */
-    .partner-children{display:flex;flex-direction:column;align-items:center;margin-left:46px;}
+    .partner-stop-row{display:flex;align-items:center;gap:6px;padding:6px 0;}
+    .partner-children{display:flex;flex-direction:column;margin-left:20px;}
     .partner-children.hidden{display:none!important;}
-    /* Vertical spine line drawn via border */
-    .partner-spine{border-left:2px solid var(--connector);padding-left:0;margin-left:1px;}
+    .children-section{display:flex;flex-direction:column;}
+    .children-section.hidden{display:none;}
+
 
     /* Desktop cards — wider to fit full names */
     .card{display:inline-flex;flex-direction:column;align-items:center;background:var(--card-bg);border:2px solid var(--bark-light);border-radius:10px;padding:6px 10px;cursor:pointer;box-shadow:0 2px 6px var(--shadow);transition:transform .18s,box-shadow .18s,border-color .18s;width:120px;text-align:center;user-select:none;flex-shrink:0;position:relative;}
@@ -600,183 +604,165 @@ function makeCard(person,isSpouse){
   return `<div class="${cls.join(' ')}" ${touchAttr}>${h}</div>`;
 }
 
-/* Render children with horizontal bar (desktop) or plain list (mobile) */
-function renderChildrenSection(children, uid) {
-  if(!children||!children.length) return '';
-  const slots = children.map(c=>`
-    <div class="child-slot">
-      <div class="child-drop" style="height:16px"></div>
-      ${renderPerson(c)}
-    </div>`).join('');
-  return `
-    <div class="children-section hidden" id="${uid}">
-      <div class="h-bar-wrap"><div class="h-bar"></div></div>
-      <div class="children-row">${slots}</div>
-    </div>`;
-}
+/* ── UNIFIED RENDER: everything uses the same spine style ──
+   [Person + Spouse] ─── [Child 1] [+]
+                     ├── [Child 2] [+]
+                     └── [Child 3]
+   The expand [+] reveals that child's own branch inline.
+*/
 
-/* Multi-partner branch: person on left, horizontal line right,
-   partners stacked vertically along spine, children expand below each */
-function renderMultiPartner(person) {
-  const selfCard = makeCard(person, false);
+// Render a person's full node: their couple row + their children as a spine
+function renderPerson(person){
   const marriages = person.marriages||[];
+  const hasBio = !!person.bioChild;
+  const selfCard = makeCard(person, false);
 
-  const partnerStops = marriages.map((marriage) => {
-    const mUid = 'mp'+Math.random().toString(36).substr(2,9);
-    const hasKids = marriage.children&&marriage.children.length>0;
-    const spouseCard = marriage.spouse ? makeCard(marriage.spouse, true) : '';
+  // No marriages at all — just the card
+  if(!hasBio && marriages.length === 0){
+    return `<div class="node">${selfCard}</div>`;
+  }
 
-    let childrenHTML = '';
-    if(hasKids){
-      const slots = marriage.children.map(c=>`
-        <div class="child-slot">
-          <div class="child-drop" style="height:16px"></div>
-          ${renderPerson(c)}
-        </div>`).join('');
-      childrenHTML = `
-        <div class="partner-children hidden" id="${mUid}">
-          <div class="h-bar-wrap"><div class="h-bar"></div></div>
-          <div class="children-row">${slots}</div>
+  // Multiple marriages — person on left, each marriage is a spine stop
+  if(!hasBio && marriages.length > 1){
+    const stops = marriages.map(marriage => {
+      const mUid = 'mp'+Math.random().toString(36).substr(2,9);
+      const spouseCard = marriage.spouse ? `<span class="plus">+</span>${makeCard(marriage.spouse,true)}` : '';
+      const kids = marriage.children||[];
+      const childSpine = kids.length ? renderSpine(kids, mUid) : '';
+      return `
+        <div class="spine-stop">
+          <div class="spine-tick">
+            <div class="spine-tick-line"></div>
+            <div class="spine-row">
+              ${spouseCard}
+              ${kids.length?`<div class="expand-dot" onclick="toggleSpine('${mUid}')">+</div>`:''}
+            </div>
+          </div>
+          ${childSpine}
         </div>`;
-    }
+    }).join('');
+    return `<div class="node">
+      <div class="branch-layout">
+        <div class="branch-self">${selfCard}</div>
+        <div class="branch-hline"></div>
+        <div class="branch-spine">${stops}</div>
+      </div>
+    </div>`;
+  }
 
-    return `
-      <div class="partner-stop">
-        <div class="partner-tick">
-          <div class="partner-tick-line"></div>
-          <div class="partner-stop-row">
-            ${spouseCard}
-            ${hasKids?`<div class="expand-dot" onclick="togglePartner('${mUid}')" title="Show children">+</div>`:''}
+  // Single marriage
+  const marriage = marriages[0];
+  const spouse = marriage ? marriage.spouse : null;
+  const kids   = marriage ? (marriage.children||[]) : [];
+  const coupleRow = `<div class="couple-row">
+    ${selfCard}
+    ${spouse?`<span class="plus">+</span>${makeCard(spouse,true)}`:''}
+  </div>`;
+
+  // Bio child (Herman/Leon style)
+  let bioHTML = '';
+  if(hasBio){
+    const bc = person.bioChild;
+    const bcUid = 'bc'+Math.random().toString(36).substr(2,9);
+    const bcKids = bc.marriages ? bc.marriages.flatMap(m=>m.children||[]) : [];
+    const bcSpine = bcKids.length ? renderSpine(bcKids, bcUid) : '';
+    bioHTML = `
+      <div class="spine-stop">
+        <div class="spine-tick">
+          <div class="spine-tick-line" style="border-top:2px dashed var(--rose);background:none;"></div>
+          <div class="spine-row">
+            <div class="card blood${bc.deceased?' deceased':''}">
+              <div class="name-tip">${bc.name}</div>
+              ${bc.nickname?`<span class="nickname">${bc.nickname}</span>`:''}
+              <span class="fullname">${bc.name}</span>
+              ${bc.deceased?doveMark():''}
+              <span class="bio-tag">${bc.bioTag}</span>
+            </div>
+            ${bcKids.length?`<div class="expand-dot" onclick="toggleSpine('${bcUid}')">+</div>`:''}
           </div>
         </div>
-        ${childrenHTML}
+        ${bcSpine}
       </div>`;
-  });
+  }
 
-  return `<div class="person-node">
-    <div class="multi-partner-layout">
-      <div class="multi-partner-person">${selfCard}</div>
-      <div class="partner-h-line"></div>
-      <div class="partner-spine-wrap">
-        <div class="partner-spine">
-          ${partnerStops.join('')}
-        </div>
+  if(!kids.length && !hasBio) return `<div class="node">${coupleRow}</div>`;
+
+  // Single child — show inline without expand button
+  if(kids.length === 1 && !hasBio){
+    const uid = 'm'+Math.random().toString(36).substr(2,9);
+    const spine = renderSpine(kids, uid);
+    return `<div class="node">
+      <div class="branch-layout">
+        <div class="branch-self">${coupleRow}</div>
+        <div class="branch-hline"></div>
+        <div class="branch-spine">${
+          kids.map(child=>`
+            <div class="spine-stop">
+              <div class="spine-tick">
+                <div class="spine-tick-line"></div>
+                <div class="spine-row">${renderPerson(child)}</div>
+              </div>
+            </div>`).join('')
+        }</div>
       </div>
+    </div>`;
+  }
+
+  // Multiple children — spine with expand per child
+  const uid = 'm'+Math.random().toString(36).substr(2,9);
+  const childStops = kids.map(child => {
+    const cUid = 'c'+Math.random().toString(36).substr(2,9);
+    const childKids = child.marriages ? child.marriages.flatMap(m=>m.children||[]) : [];
+    const childMulti = child.marriages && child.marriages.length > 1;
+    // For children with their own families, wrap in expandable stop
+    return `
+      <div class="spine-stop">
+        <div class="spine-tick">
+          <div class="spine-tick-line"></div>
+          <div class="spine-row">${renderPerson(child)}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Wrap all children in a collapsible group
+  const allStops = bioHTML + `
+    <div class="spine-stop">
+      <div class="spine-tick">
+        <div class="spine-tick-line" style="width:0"></div>
+        <div class="expand-dot" style="margin-left:-10px" onclick="toggleSpine('${uid}')">+</div>
+      </div>
+      <div class="spine-section hidden" id="${uid}">
+        <div class="branch-spine-inner">${childStops}</div>
+      </div>
+    </div>`;
+
+  return `<div class="node">
+    <div class="branch-layout">
+      <div class="branch-self">${coupleRow}</div>
+      <div class="branch-hline"></div>
+      <div class="branch-spine">${allStops}</div>
     </div>
   </div>`;
 }
 
-function renderPerson(person){
-  const marriages = person.marriages||[];
-  const hasBio = !!person.bioChild;
-
-  // Multi-partner: always use branch layout
-  if(!hasBio && marriages.length > 1){
-    return renderMultiPartner(person);
-  }
-
-  const selfCard = makeCard(person, false);
-
-  // Single marriage (or none)
-  if(!hasBio && marriages.length<=1){
-    const marriage = marriages[0];
-    const hasKids = marriage&&marriage.children&&marriage.children.length>0;
-    const uid = 'm'+Math.random().toString(36).substr(2,9);
-
-    const coupleRow = `<div class="couple-row">
-      ${selfCard}
-      ${marriage&&marriage.spouse?`<span class="plus">+</span>${makeCard(marriage.spouse,true)}`:''}
-    </div>`;
-
-    if(!hasKids) return `<div class="person-node">${coupleRow}</div>`;
-
-    // Multiple children: use vertical branch layout (same as multi-partner)
-    if(marriage.children.length > 1){
-      const childStops = marriage.children.map(child => {
-        const cUid = 'cb'+Math.random().toString(36).substr(2,9);
-        const childNode = renderPerson(child);
-        const hasGrandkids = child.marriages&&child.marriages.some(m=>m.children&&m.children.length>0);
-        return `
-          <div class="partner-stop">
-            <div class="partner-tick">
-              <div class="partner-tick-line"></div>
-              <div class="partner-stop-row">
-                ${childNode}
-              </div>
-            </div>
-          </div>`;
-      }).join('');
-
-      return `<div class="person-node">
-        <div class="multi-partner-layout">
-          <div class="multi-partner-person">
-            ${coupleRow}
-          </div>
-          <div class="partner-h-line"></div>
-          <div class="partner-spine-wrap">
-            <div class="partner-spine">
-              ${childStops}
-            </div>
-          </div>
-        </div>
-      </div>`;
-    }
-
-    // Single child: keep simple vertical drop
-    return `<div class="person-node">
-      ${coupleRow}
-      <div class="v-stem" style="height:6px"></div>
-      <div class="expand-dot" onclick="toggleFamily('${uid}')" title="Show children">+</div>
-      <div class="v-stem" style="height:6px"></div>
-      ${renderChildrenSection(marriage.children, uid)}
-    </div>`;
-  }
-
-  // Bio child + marriages: stack as before
-  let blocksHTML = '';
-
-  if(hasBio){
-    const bc = person.bioChild;
-    const bcUid = 'bc'+Math.random().toString(36).substr(2,9);
-    const bcKids = bc.marriages&&bc.marriages.some(m=>m.children&&m.children.length);
-    const bcChildren = bcKids ? bc.marriages.flatMap(m=>m.children||[]) : [];
-    blocksHTML += `
-      <div class="bio-row">
-        <div class="bio-connector"></div>
-        <div style="display:flex;flex-direction:column;align-items:center">
-          <div class="card blood${bc.unknown?' unknown':''}${bc.deceased?' deceased':''}">
-            <div class="name-tip">${bc.name}</div>
-            ${bc.nickname?`<span class="nickname">${bc.nickname}</span>`:''}
-            <span class="fullname">${bc.name}</span>
-            ${bc.deceased?doveMark():''}
-            <span class="bio-tag">${bc.bioTag}</span>
-          </div>
-          ${bcKids?`<div class="v-stem" style="height:6px"></div>
-          <div class="expand-dot" onclick="toggleFamily('${bcUid}')">+</div>
-          <div class="v-stem" style="height:6px"></div>
-          ${renderChildrenSection(bcChildren,bcUid)}`:''}
-        </div>
-      </div>`;
-  }
-
-  marriages.forEach((marriage)=>{
-    const mUid = 'm'+Math.random().toString(36).substr(2,9);
-    const hasKids = marriage.children&&marriage.children.length>0;
-    blocksHTML += `
-      <div class="marriage-block">
-        <div class="couple-row">
-          ${selfCard}
-          ${marriage.spouse?`<span class="plus">+</span>${makeCard(marriage.spouse,true)}`:''}
-        </div>
-        ${hasKids?`<div class="v-stem" style="height:6px"></div>
-        <div class="expand-dot" onclick="toggleFamily('${mUid}')">+</div>
-        <div class="v-stem" style="height:6px"></div>
-        ${renderChildrenSection(marriage.children,mUid)}`:''}
-      </div>`;
-  });
-
-  return `<div class="person-node"><div class="marriages-stack">${blocksHTML}</div></div>`;
+// Render a list of children as a collapsible spine section
+function renderSpine(children, uid){
+  const stops = children.map(child=>`
+    <div class="spine-stop">
+      <div class="spine-tick">
+        <div class="spine-tick-line"></div>
+        <div class="spine-row">${renderPerson(child)}</div>
+      </div>
+    </div>`).join('');
+  return `<div class="spine-section hidden" id="${uid}">
+    <div class="branch-spine-inner">${stops}</div>
+  </div>`;
 }
+
+// Legacy stubs (kept for toggleFamily calls that may exist)
+function renderChildrenSection(children, uid){ return renderSpine(children, uid); }
+function renderMultiPartner(person){ return renderPerson(person); }
+
 
 // ── SPECIAL ROOT RENDER ──
 function renderRoot(tree) {
@@ -787,10 +773,10 @@ function renderRoot(tree) {
   const germCard = makeCard(rootMarriage.spouse, true);
 
   const childStops = children.map(child => `
-    <div class="partner-stop">
-      <div class="partner-tick">
-        <div class="partner-tick-line"></div>
-        <div class="partner-stop-row">${renderPerson(child)}</div>
+    <div class="spine-stop">
+      <div class="spine-tick">
+        <div class="spine-tick-line"></div>
+        <div class="spine-row">${renderPerson(child)}</div>
       </div>
     </div>`).join('');
 
@@ -803,10 +789,8 @@ function renderRoot(tree) {
           ${germCard}
         </div>
         <div id="root-branch" class="root-branch-hidden">
-          <div class="partner-h-line"></div>
-          <div class="partner-spine-wrap">
-            <div class="partner-spine">${childStops}</div>
-          </div>
+          <div class="branch-hline" style="margin-top:38px;"></div>
+          <div class="branch-spine">${childStops}</div>
         </div>
       </div>
       <button class="root-toggle-btn" id="root-toggle-btn" onclick="toggleRoot()">
@@ -837,21 +821,15 @@ function toggleRoot(){
 }
 
 
-function toggleFamily(uid){
+function toggleSpine(uid){
   const section=document.getElementById(uid);if(!section)return;
   const hidden=section.classList.contains('hidden');
   section.classList.toggle('hidden');
   const dot=document.querySelector(`.expand-dot[onclick*="'${uid}'"]`);
   if(dot){dot.textContent=hidden?'−':'+';dot.classList.toggle('open',hidden);}
 }
-
-function togglePartner(uid){
-  const section=document.getElementById(uid);if(!section)return;
-  const hidden=section.classList.contains('hidden');
-  section.classList.toggle('hidden');
-  const dot=document.querySelector(`.expand-dot[onclick*="'${uid}'"]`);
-  if(dot){dot.textContent=hidden?'−':'+';dot.classList.toggle('open',hidden);}
-}
+function toggleFamily(uid){toggleSpine(uid);}
+function togglePartner(uid){toggleSpine(uid);}
 
 // Delegated meal button handler — avoids all JSON/quote escaping issues
 document.getElementById('treeWrap').addEventListener('click',function(e){
