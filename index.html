@@ -21,7 +21,7 @@
   .hero-wave{position:absolute;bottom:0;left:0;width:100%;pointer-events:none;}
   .hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,6vw,3.6rem);color:#fff;line-height:1.15;text-shadow:0 2px 10px rgba(0,0,0,.35);}
   .hero-sub{margin-top:10px;color:rgba(255,255,255,.82);font-size:clamp(.8rem,3vw,1.05rem);font-style:italic;}
-  .legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px;}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px;padding:0 8px;}
   .legend-item{background:rgba(255,255,255,.16);border-radius:20px;padding:4px 10px;color:#fff;font-size:.75rem;display:flex;align-items:center;gap:6px;}
 
   /* TREE WRAP */
@@ -176,7 +176,8 @@
   .root-branch-wrap.hidden{display:none;}
   .root-branch-wrap.open{max-height:4000px;opacity:1;display:block;}
   .root-layout{display:flex;align-items:flex-start;}
-  .root-couple-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+  .root-couple-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;cursor:pointer;}
+  .root-couple-left:hover > div{opacity:.85;}
   .root-hint{font-size:.65rem;color:var(--muted);font-style:italic;margin-top:4px;text-align:center;transition:opacity .2s;}
   .card.root:hover ~ .root-hint, .card.root:focus ~ .root-hint{opacity:0;}
 
@@ -777,43 +778,35 @@ function renderPerson(person){
 }
 
 // ── SPECIAL ROOT RENDER ──
-// Maggie & German centered; clicking either card reveals vertical branch
 function renderRoot(tree) {
   const rootMarriage = tree.marriages[0];
   const children = rootMarriage.children || [];
-  const branchId = 'root-branch';
 
   const maggCard = makeCard(tree, false);
   const germCard = makeCard(rootMarriage.spouse, true);
 
-  // Build the vertical child branch (same spine style as multi-partner)
-  const childStops = children.map(child => {
-    return `
+  const childStops = children.map(child => `
       <div class="partner-stop">
         <div class="partner-tick">
           <div class="partner-tick-line"></div>
-          <div class="partner-stop-row">
-            ${renderPerson(child)}
-          </div>
+          <div class="partner-stop-row">${renderPerson(child)}</div>
         </div>
-      </div>`;
-  }).join('');
+      </div>`).join('');
 
   return `
     <div class="root-wrap">
-      <!-- Centered couple — both cards trigger toggle -->
-      <div class="root-couple" id="root-couple" onclick="toggleRoot()" title="Click to expand family">
+      <!-- Centered couple (collapsed state) -->
+      <div class="root-couple" id="root-couple" title="Click to explore the family">
         ${maggCard}
         <span class="plus">+</span>
         ${germCard}
       </div>
       <div class="root-hint" id="root-hint">Click to explore the family ↓</div>
 
-      <!-- Collapsible branch -->
-      <div class="root-branch-wrap hidden" id="${branchId}">
+      <!-- Expanded branch (open state) -->
+      <div class="root-branch-wrap hidden" id="root-branch">
         <div class="root-layout">
-          <!-- Couple repeated on left when open -->
-          <div class="root-couple-left">
+          <div class="root-couple-left" id="root-couple-open" title="Click to collapse">
             <div style="display:flex;align-items:center;gap:0;">
               ${maggCard}
               <span class="plus">+</span>
@@ -822,9 +815,7 @@ function renderRoot(tree) {
           </div>
           <div class="partner-h-line"></div>
           <div class="partner-spine-wrap">
-            <div class="partner-spine">
-              ${childStops}
-            </div>
+            <div class="partner-spine">${childStops}</div>
           </div>
         </div>
       </div>
@@ -833,22 +824,26 @@ function renderRoot(tree) {
 
 document.getElementById('treeWrap').innerHTML=`<div class="tree-root">${renderRoot(TREE)}</div>`;
 
+// Attach click handlers after DOM is built
+document.getElementById('root-couple').addEventListener('click', toggleRoot);
+document.getElementById('root-couple-open').addEventListener('click', toggleRoot);
+
 function toggleRoot(){
-  const branch = document.getElementById('root-branch');
-  const couple = document.getElementById('root-couple');
-  const hint   = document.getElementById('root-hint');
-  const isOpen = branch.classList.contains('open');
+  const branch  = document.getElementById('root-branch');
+  const couple  = document.getElementById('root-couple');
+  const hint    = document.getElementById('root-hint');
+  const isOpen  = !branch.classList.contains('hidden');
 
   if(isOpen){
-    branch.classList.remove('open');
+    // Collapse: show centered couple, hide branch
     branch.classList.add('hidden');
-    couple.style.display = 'flex';
-    hint.style.display = 'block';
+    couple.style.display = '';
+    hint.style.display   = '';
   } else {
+    // Expand: hide centered couple, show branch
     branch.classList.remove('hidden');
-    branch.classList.add('open');
     couple.style.display = 'none';
-    hint.style.display = 'none';
+    hint.style.display   = 'none';
   }
 }
 
