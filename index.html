@@ -421,7 +421,7 @@
         <div class="form-row"><label>Education</label><input type="text" id="icEducation" placeholder="e.g. B.S. in Communications, ECSU"></div>
         <div class="form-row"><label>Career / Occupation</label><input type="text" id="icCareer" placeholder="e.g. Project Coordinator"></div>
         <div class="form-row"><label>Favorite Color</label><input type="text" id="icColor" placeholder="e.g. Yellow"></div>
-        <div class="form-row"><label>Favorite Song</label><input type="text" id="icSong" placeholder="e.g. The Less I Know the Better — Tame Impala"></div>
+        <div class="form-row"><label>Favorite Song</label><input type="text" id="icSong" placeholder="e.g. Less I Know the Better — Tame Impala"></div>
         <div class="form-row"><label>Favorite Snack</label><input type="text" id="icSnack" placeholder="e.g. Stove-popped Popcorn"></div>
         <div class="form-row"><label>Hobbies</label><input type="text" id="icHobbies" placeholder="e.g. Reading, Crocheting, Web Design"></div>
         <div class="form-row"><label>Anything else you'd like to share</label><textarea id="icOther" placeholder="A memory, a message to the family, or anything on your heart…"></textarea></div>
@@ -570,7 +570,8 @@ const TREE = {
                          },
                          favorites:{
                            color:'Yellow',
-                           song:'The Less I Know the Better — Tame Impala',
+                           colorCss:'#F5C518',
+                           song:'Less I Know the Better — Tame Impala',
                            songPreview:'https://p.scdn.co/mp3-preview/8db6a24c5b8fca4cbba5f06fcbef1f2cd63fa7cf',
                            snack:'Stove-popped Popcorn',
                            hobbies:'Writing, Reading, Web Design & Crocheting'
@@ -994,7 +995,7 @@ function openProfile(e, name, cardEl){
   // Favorites
   const fav = profile.favorites || {};
   const favItems = [
-    {label:'Favorite Color', value:fav.color, icon:'color'},
+    {label:'Favorite Color', value:fav.color, css:fav.colorCss||null, icon:'color'},
     {label:'Favorite Song', value:fav.song, preview:fav.songPreview, icon:'music'},
     {label:'Favorite Snack', value:fav.snack, icon:'snack'},
     {label:'Hobbies', value:fav.hobbies, icon:'hobby'},
@@ -1010,9 +1011,12 @@ function openProfile(e, name, cardEl){
         snack:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>`,
         hobby:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" stroke-linejoin="round"/></svg>`
       }[item.icon]||'';
+      const isColor = item.icon === 'color';
+      const colorStyle = isColor && item.css ? `style="border-color:${item.css};background:linear-gradient(135deg,${item.css}15,${item.css}30);"` : '';
+      const colorValueStyle = isColor && item.css ? `style="color:${item.css};font-weight:800;font-size:.95rem;"` : '';
       const previewAttr = item.icon === 'music' && item.value ? `data-song="${item.value.replace(/"/g,'&quot;')}" onmouseenter="playSongPreview(this)" onmouseleave="stopSongPreview()"` : '';
       const hoverHint = item.icon === 'music' && item.value ? `<div style="font-size:.55rem;color:var(--leaf);margin-top:3px;font-style:italic;">Hover to preview</div>` : '';
-      favHTML += `<div class="fav-item" ${previewAttr}><div class="fav-label">${iconSVG} ${item.label}</div><div class="fav-value">${item.value}</div>${hoverHint}</div>`;
+      favHTML += `<div class="fav-item" ${previewAttr} ${colorStyle}><div class="fav-label">${iconSVG} ${item.label}</div><div class="fav-value" ${colorValueStyle}>${item.value}</div>${hoverHint}</div>`;
     }
   });
   favHTML += '</div>';
@@ -1036,7 +1040,7 @@ function closeProfile(){
   document.getElementById('panel-0').innerHTML = `<div class="profile-photo-wrap"><img id="profilePhotoFull" src="" alt="" style="width:100%;display:block;object-fit:cover;max-height:340px;border-radius:12px;"></div>`;
 }
 
-// Song preview — auto-fetches from iTunes API using song title
+// Song preview — auto-fetches from iTunes API using song title + artist
 let _previewAudio = null;
 let _previewCache = {};
 
@@ -1044,29 +1048,35 @@ async function playSongPreview(el){
   const song = el.getAttribute('data-song');
   if(!song) return;
   stopSongPreview();
-
-  // Show loading state
   el.style.opacity = '0.7';
 
   try{
-    // Check cache first
     if(_previewCache[song]){
-      _playAudio(el, _previewCache[song]);
-      return;
+      _playAudio(el, _previewCache[song]); return;
     }
-    // Fetch from iTunes Search API (no key needed, CORS-friendly)
-    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(song)}&media=music&limit=1&entity=song`);
+    // Split "Song Title — Artist" format for better accuracy
+    const parts = song.split(/\s*[—–-]\s*/);
+    const title = parts[0].trim();
+    const artist = parts[1] ? parts[1].trim() : '';
+    const query = artist ? `${title} ${artist}` : title;
+    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=5&entity=song`);
     const json = await res.json();
-    const previewUrl = json.results && json.results[0] && json.results[0].previewUrl;
+    // Find best match — prefer exact artist match
+    let best = null;
+    if(json.results && json.results.length){
+      if(artist){
+        best = json.results.find(r => r.artistName.toLowerCase().includes(artist.toLowerCase()));
+      }
+      if(!best) best = json.results[0];
+    }
+    const previewUrl = best && best.previewUrl;
     if(previewUrl){
       _previewCache[song] = previewUrl;
       _playAudio(el, previewUrl);
     } else {
       el.style.opacity = '1';
     }
-  } catch(err){
-    el.style.opacity = '1';
-  }
+  } catch(err){ el.style.opacity = '1'; }
 }
 
 function _playAudio(el, url){
