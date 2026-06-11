@@ -505,128 +505,127 @@ const TREE = {
     spouse:{name:'John Moseby',deceased:true},
     children:[
       {blood:true,deceased:true,nickname:'Dolly',name:'Lena Moseby',
-        meals:['Lasagna','Fried Chicken','Fried Pork Chops','Fried Potatoes & Onions','Salisbury Steak'],
+  meals:['Lasagna','Fried Chicken','Fried Pork Chops','Fried Potatoes & Onions','Salisbury Steak'],
+  marriages:[
+    // 1. Norman Collins
+    {spouse:{name:'Norman Collins'},children:[
+      {blood:true,name:'Norman Collins II',meals:['?','?','?'],marriages:[
+        {spouse:{name:'Doreen Smith'},children:[
+          {blood:true,deceased:true,name:'Warren'},
+          {blood:true,nickname:'Little Norman',name:'Norman Collins III'}
+        ]},
+        {spouse:{name:'Leona Collins'},children:[]}
+      ]},
+      {blood:true,name:'Dennis Collins',meals:['?','?','?'],marriages:[]}
+    ]},
+    // 2. Unnamed Ancestor
+    {spouse:{name:'Unnamed Ancestor',unknown:true},children:[
+      {blood:true,name:'Pamela Hunt',
+        meals:['Tacos','Spaghetti','Fried Fish'],
         marriages:[
-          // 1. Norman Collins
-          {spouse:{name:'Norman Collins'},children:[
-            {blood:true,name:'Norman Collins II',meals:['?','?','?'],marriages:[
-              {spouse:{name:'Doreen Smith'},children:[
-                {blood:true,deceased:true,name:'Warren'},
-                {blood:true,nickname:'Little Norman',name:'Norman Collins III'}
+          {spouse:{name:'Herbert John Wesley',deceased:true},children:[
+            {blood:true,name:'Wesley Jermaine Collins',marriages:[
+              {spouse:{name:'Jasmine Collins'},children:[{blood:true,nickname:'Little Wes',name:'Wesley Jermaine Collins II'}]}
+            ]}
+          ]},
+          {spouse:{name:'Roderick Garnet Hunt'},children:[
+            {blood:true,nickname:'RJ',name:'Roderick Garnet Hunt II',marriages:[
+              {spouse:{name:'Danielle Degrate'},children:[{blood:true,name:'Raeannah Hunt'}]},
+              {spouse:{name:'Amanda Howard'},children:[
+                {blood:true,name:'Josiyah Garnet Hunt'},{blood:true,name:'Jaliyah Hunt'},{blood:true,name:'Janiyah Hunt'}
               ]},
-              {spouse:{name:'Leona Collins'},children:[]}
-            ]},
-            {blood:true,name:'Dennis Collins',meals:['?','?','?'],marriages:[]}
-          ]},
-          // 2. Unknown
-          {spouse:{name:'Unnamed Ancestor',unknown:true},children:[
-            {blood:true,name:'Pamela Hunt',
-              meals:['Tacos','Spaghetti','Fried Fish'],
-              marriages:[
-                {spouse:{name:'Herbert John Wesley',deceased:true},children:[
-                  {blood:true,name:'Wesley Jermaine Collins',marriages:[
-                    {spouse:{name:'Jasmine Collins'},children:[{blood:true,nickname:'Little Wes',name:'Wesley Jermaine Collins II'}]}
-                  ]}
-                ]},
-                {spouse:{name:'Roderick Garnet Hunt'},children:[
-                  {blood:true,nickname:'RJ',name:'Roderick Garnet Hunt II',marriages:[
-                    {spouse:{name:'Danielle Degrate'},children:[{blood:true,name:'Raeannah Hunt'}]},
-                    {spouse:{name:'Amanda Howard'},children:[
-                      {blood:true,name:'Josiyah Garnet Hunt'},{blood:true,name:'Jaliyah Hunt'},{blood:true,name:'Janiyah Hunt'}
-                    ]},
-                    {spouse:{name:'Jennifer Hall'},children:[
-                      {blood:true,name:'Jada Hunt'},{blood:true,name:'Jahari Hunt'}
-                    ]}
-                  ]}
-                ]},
-                {spouse:{name:'Charles Edwards',nickname:'Zeek',deceased:true},children:[
-                  {blood:true,name:'Tashanna Edwards',profile:{
-                    photo:TASHA_PHOTO_SRC,
-                    about:{
-                      birthdate:'August 5, 1990',
-                      birthplace:'New London, Connecticut',
-                      education:'B.S. in Communications, Eastern Connecticut State University',
-                      career:'Project Coordinator at Rewired Education Group & Founder of TecWeb Studio'
-                    },
-                    favorites:{
-                      color:'Yellow',
-                      colorCss:'#F5C518',
-                      song:'Doo Wop (That Thing) — Lauryn Hill',
-                      snack:'Stove-popped Popcorn',
-                      hobbies:'Writing, Reading, Web Design & Crocheting'
-                    }
-                  }},
-                  {blood:true,name:'Tiraa Edwards'}
-                ]},
-                {spouse:{name:'Luis Anderson'},children:[
-                  {blood:true,name:'Tianna Edwards',marriages:[
-                    {spouse:{name:'Besim Collom'},children:[{blood:true,name:'Nalla Collom',profile:{
-                      photo:"",
-                      about:{
-                        birthdate:'November 11, 2022',
-                        birthplace:'Norwich, Connecticut',
-                        education:'Preschool, Watching Bluey',
-                        career:'Chef, Doctor, Track Star'
-                      },
-                      favorites:{
-                        color:'Green',
-                        colorCss:'#228B22',
-                        song:'Every Praise — Hezekiah Walker',
-                        snack:'Slim Jim',
-                        hobbies:'Squeezing Mama and Dada so tight!, playing treasure hunt with TiTi & playing customer!'
-                      }
-                    }}]}
-                  ]}
-                ]},
-                {spouse:{name:'Malik Jones',nickname:'Yehoshua'},children:[{blood:true,nickname:'Joshua',name:'Yehoshua Yehudah'}]},
-                {spouse:{name:'Robert Ford',nickname:'Kevin Kelly'},children:[
-                  {blood:true,name:'Tyrique Edwards',marriages:[
-                    {spouse:{name:'Nafysa Edwards'},children:[]}
-                  ]}
-                ]},
-                {spouse:{name:'Andre Vegas Jr.'},children:[{blood:true,name:'Tyicia Edwards'}]}
+              {spouse:{name:'Jennifer Hall'},children:[
+                {blood:true,name:'Jada Hunt'},{blood:true,name:'Jahari Hunt'}
               ]}
             ]}
           ]},
-          // 3. Jim Higgins
-          {spouse:{name:'Jim Higgins'},children:[
-            {blood:true,name:'Darlene Duncan',meals:['Kielbasa','Hamburger Helper','Pork Chops'],marriages:[
-              {spouse:{name:'Ellis Duncan'},children:[
-                {blood:true,name:'Nicole Duncan',marriages:[
-                  {spouse:{name:'Nate Butler'},children:[{blood:true,nickname:'Nani',name:"Nei'Halani Butler"}]},
-                  {spouse:{name:'Omarii Benson'},children:[{blood:true,name:'Mistah Benson'}]}
-                ]},
-                {blood:true,name:'Michelle Duncan',marriages:[
-                  {spouse:{name:'Jemmel McIntosh',nickname:'Jah'},children:[{blood:true,name:'Love MacIntosh'}]},
-                  {spouse:{name:'Louis Nieves-Rosado',nickname:'Chester'},children:[{blood:true,name:'Grey Nieves-Duncan'}]}
-                ]},
-                {blood:true,name:'Sherell Duncan',marriages:[
-                  {spouse:{name:'Marcelino Baretto'},children:[{blood:true,name:'Amayah Baretto'}]},
-                  {spouse:{name:'Robert Cardoza Jr.'},children:[{blood:true,name:'Zacari Cardoza'}]}
-                ]}
-              ]}
+          {spouse:{name:'Charles Edwards',nickname:'Zeek',deceased:true},children:[
+            {blood:true,name:'Tashanna Edwards',profile:{
+              photo:TASHA_PHOTO_SRC,
+              about:{
+                birthdate:'August 5, 1990',
+                birthplace:'New London, Connecticut',
+                education:'B.S. in Communications, Eastern Connecticut State University',
+                career:'Project Coordinator at Rewired Education Group & Founder of TecWeb Studio'
+              },
+              favorites:{
+                color:'Yellow',
+                colorCss:'#F5C518',
+                song:'Doo Wop (That Thing) — Lauryn Hill',
+                snack:'Stove-popped Popcorn',
+                hobbies:'Writing, Reading, Web Design & Crocheting'
+              }
+            }},
+            {blood:true,name:'Tiraa Edwards'}
+          ]},
+          {spouse:{name:'Luis Anderson'},children:[
+            {blood:true,name:'Tianna Edwards',marriages:[
+              {spouse:{name:'Besim Collom'},children:[{blood:true,name:'Nalla Collom',profile:{
+                photo:"",
+                about:{
+                  birthdate:'November 11, 2022',
+                  birthplace:'Norwich, Connecticut',
+                  education:'Preschool, Watching Bluey',
+                  career:'Chef, Doctor, Track Star'
+                },
+                favorites:{
+                  color:'Green',
+                  colorCss:'#228B22',
+                  song:'Every Praise — Hezekiah Walker',
+                  snack:'Slim Jim',
+                  hobbies:'Squeezing Mama and Dada so tight!, playing treasure hunt with TiTi & playing customer!'
+                }
+              }}]}
             ]}
           ]},
-          // 4. Lemuel Pearsall
-          {spouse:{name:'Lemuel Pearsall',deceased:true},children:[
-            {blood:true,name:'Michael Collins',meals:['Red Beans & Rice','Spaghetti','Fried Chicken with Rice & Gravy'],marriages:[
-              {spouse:{name:'Eloise Collins',nickname:'Debby'},children:[
-                {adoptedFamily:true,name:'Antwon',adopted:true,adoptedBy:'Michael Collins'},
-                {adoptedFamily:true,name:'Ricardo',adopted:true,adoptedBy:'Michael Collins'},
-                {adoptedFamily:true,name:'Lakita',adopted:true,adoptedBy:'Michael Collins'}
-              ]}
+          {spouse:{name:'Malik Jones',nickname:'Yehoshua'},children:[{blood:true,nickname:'Joshua',name:'Yehoshua Yehudah'}]},
+          {spouse:{name:'Robert Ford',nickname:'Kevin Kelly'},children:[
+            {blood:true,name:'Tyrique Edwards',marriages:[
+              {spouse:{name:'Nafysa Edwards'},children:[]}
             ]}
           ]},
-          // 5. William Ruff
-          {spouse:{name:'William Ruff',deceased:true},children:[
-            {blood:true,name:'Cheryll Hunter',nickname:'Missy',meals:['Spaghetti','Chicken Rice Gravy with Broccoli','Fettuccine'],marriages:[
-              {spouse:{name:'Bryan Hunter'},children:[
-                {blood:true,name:'Imanni Hunter'},{blood:true,name:'Imarra Hunter'},{blood:true,name:'Imannuel Hunter'}
-              ]}
-            ]}
+          {spouse:{name:'Andre Vegas Jr.'},children:[{blood:true,name:'Tyicia Edwards'}]}
+        ]}
+      ]}
+    ]},
+    // 3. Jim Higgins
+    {spouse:{name:'Jim Higgins'},children:[
+      {blood:true,name:'Darlene Duncan',meals:['Kielbasa','Hamburger Helper','Pork Chops'],marriages:[
+        {spouse:{name:'Ellis Duncan'},children:[
+          {blood:true,name:'Nicole Duncan',marriages:[
+            {spouse:{name:'Nate Butler'},children:[{blood:true,nickname:'Nani',name:"Nei'Halani Butler"}]},
+            {spouse:{name:'Omarii Benson'},children:[{blood:true,name:'Mistah Benson'}]}
+          ]},
+          {blood:true,name:'Michelle Duncan',marriages:[
+            {spouse:{name:'Jemmel McIntosh',nickname:'Jah'},children:[{blood:true,name:'Love MacIntosh'}]},
+            {spouse:{name:'Louis Nieves-Rosado',nickname:'Chester'},children:[{blood:true,name:'Grey Nieves-Duncan'}]}
+          ]},
+          {blood:true,name:'Sherell Duncan',marriages:[
+            {spouse:{name:'Marcelino Baretto'},children:[{blood:true,name:'Amayah Baretto'}]},
+            {spouse:{name:'Robert Cardoza Jr.'},children:[{blood:true,name:'Zacari Cardoza'}]}
           ]}
         ]}
-      ]},
+      ]}
+    ]},
+    // 4. Lemuel Pearsall
+    {spouse:{name:'Lemuel Pearsall',deceased:true},children:[
+      {blood:true,name:'Michael Collins',meals:['Red Beans & Rice','Spaghetti','Fried Chicken with Rice & Gravy'],marriages:[
+        {spouse:{name:'Eloise Collins',nickname:'Debby'},children:[
+          {adoptedFamily:true,name:'Antwon',adopted:true,adoptedBy:'Michael Collins'},
+          {adoptedFamily:true,name:'Ricardo',adopted:true,adoptedBy:'Michael Collins'},
+          {adoptedFamily:true,name:'Lakita',adopted:true,adoptedBy:'Michael Collins'}
+        ]}
+      ]}
+    ]},
+    // 5. William Ruff
+    {spouse:{name:'William Ruff',deceased:true},children:[
+      {blood:true,name:'Cheryll Hunter',nickname:'Missy',meals:['Spaghetti','Chicken Rice Gravy with Broccoli','Fettuccine'],marriages:[
+        {spouse:{name:'Bryan Hunter'},children:[
+          {blood:true,name:'Imanni Hunter'},{blood:true,name:'Imarra Hunter'},{blood:true,name:'Imannuel Hunter'}
+        ]}
+      ]}
+    ]}
+  ]},
 // Tia
 {blood:true,deceased:true,nickname:'Tia',name:'Artelia Martin',
   marriages:[{spouse:{name:'Leo Jackson',deceased:true},children:[{blood:true,name:'Delores',matriarch:true},
